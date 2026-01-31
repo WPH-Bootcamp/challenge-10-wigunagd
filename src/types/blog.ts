@@ -5,20 +5,28 @@
  * Contoh structure (sesuaikan dengan API response yang sebenarnya):
  */
 
-// export interface BlogPost {
-//   id: string;
-//   title: string;
-//   content: string;
-//   author: string;
-//   createdAt: string;
-//   image?: string;
-//   category?: string;
-//   // ... tambahkan fields lainnya sesuai API
-// }
+export interface Author {
+    id: number;
+    name: string;
+    email: string;
+}
 
-// export interface BlogPostListResponse {
-//   posts: BlogPost[];
-//   total: number;
-//   page: number;
-//   // ... tambahkan fields lainnya
-// }
+export interface BlogPost {
+    id: number;
+    title: string;
+    content: string;
+    tags: string[];
+    imageUrl: string;
+    author: Author;
+    createdAt: Date;
+    likes: string;
+    comments: string;
+}
+
+export interface BlogResponse{
+    data?: BlogPost[];
+    total?: number;
+    limit?: number;
+    page?: number;
+    lastPage?: number;
+}

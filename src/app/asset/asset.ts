@@ -1,0 +1,6 @@
+export { default as logo } from './logo.png'
+export { default as searchIcon } from './search-icon.png'
+export { default as tmpBlogimg} from './tmp-blogimg.png'
+export { default as tmpProfilePicture} from './tmp-profile-picture.png'
+export { default as iconLike} from './icon-like.png'
+export { default as iconComment} from './icon-comment.png'

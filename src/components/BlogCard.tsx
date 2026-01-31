@@ -1,0 +1,45 @@
+import Image from "next/image";
+import { tmpBlogimg, tmpProfilePicture, iconLike, iconComment } from "@/app/asset/asset";
+import { BlogPost } from "@/types/blog";
+import { AspectRatio } from "@radix-ui/react-aspect-ratio";
+import { formattedDate } from "@/lib/formatDate";
+
+const BlogCard = ({ id, title, content, tags, imageUrl, author, createdAt, likes, comments }: BlogPost) => {
+    return (
+        <div className="flex flex-row w-full gap-4 border-b-2 py-7" id={(id ?? "").toString()}>
+            <div className="hidden md:block md:w-1/4">
+                <AspectRatio ratio={4 / 3}>
+                    <Image
+                        src={imageUrl || tmpBlogimg}
+                        alt="Blog Cover"
+                        fill
+                        className="rounded-sm object-cover"
+                    />
+                </AspectRatio>
+            </div>
+            <div className="w-full md:w-3/4 flex flex-col gap-3">
+                <h2 className="text-xl font-bold">{title}</h2>
+                <div className="flex flex-row gap-2">
+                    {
+                        tags?.map((tag) => (
+                            <span key={tag} className="p-1.5 border-1 rounded-lg">{tag}</span>
+                        ))
+                    }
+                </div>
+                <div className="text-ellipsis text-sm line-clamp-2">
+                    {content}
+                </div>
+                <div className="flex flex-row items-center gap-2 text-sm">
+                    <Image src={tmpProfilePicture} width={40} height={40} alt="Profile-Img" className="rounded-full" />
+                    <b>{author?.name ?? 'John Doe'}</b> &middot; <span>{formattedDate(createdAt, 'DD MMMM YYYY')}</span>
+                </div>
+                <div className="flex flex-row gap-5">
+                    <span className="flex gap-2"><Image src={iconLike} width={20} height={20} alt="Icon Like" /> {likes}</span>
+                    <span className="flex gap-2"><Image src={iconComment} width={20} height={20} alt="Icon Comment" /> {comments}</span>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default BlogCard;
