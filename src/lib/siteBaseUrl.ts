@@ -1,0 +1,1 @@
+export const siteBaseUrl = window.location.origin;

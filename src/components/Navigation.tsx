@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from 'motion/react';
 import { useGetSearch } from "@/app/(SearchQuery)/hooksSearchQuery";
 import SearchResultView from "./SearchResultView";
+import { siteBaseUrl } from "@/lib/siteBaseUrl";
 
 const MotionButton = motion.create(Button);
 
@@ -66,9 +67,11 @@ const Navigation = () => {
         <header className="fixed flex w-full top-0 bg-white border-b z-50">
             <nav className="flex w-full max-w-[1440px] h-[80px] mx-auto items-center justify-between md:px-0 px-5 relative">
 
-                <div className="flex md:text-2xl text-lg font-semibold items-center gap-2 shrink-0">
-                    <Image src={logo} alt="Logo" width={36} height={36} priority />
+                <div className="flex">
+                    <a href={siteBaseUrl} className="flex md:text-2xl text-lg font-semibold items-center gap-2 shrink-0">
+                        <Image src={logo} alt="Logo" width={36} height={36} priority />
                     Your Logo
+                    </a>
                 </div>
 
                 <div className={`
