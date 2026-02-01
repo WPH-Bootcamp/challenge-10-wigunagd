@@ -113,7 +113,7 @@ const HomePageContent = () => {
             </aside>
 
             <aside className="md:w-1/4">
-                <h1 className="text-3xl font-bold m7-7">Most Liked</h1>
+                <h1 className="text-3xl font-bold mt-7">Most Liked</h1>
 
                 <div className="w-full flex flex-col relative">
 
