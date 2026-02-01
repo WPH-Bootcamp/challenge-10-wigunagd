@@ -9,6 +9,7 @@
 
 import Navigation from "@/components/Navigation";
 import HomePageContent from "./(homepagecontent)/HomePageContent";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
       <main className="container mt-[80px] mx-auto w-full max-w-[1440px] py-2">
         <HomePageContent />
       </main>
+      <Footer />
     </div>
   );
 }

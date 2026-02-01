@@ -15,10 +15,10 @@ export interface BlogPost {
     id: number;
     title: string;
     content: string;
-    tags: string[];
-    imageUrl: string;
-    author: Author;
-    createdAt: Date;
+    tags?: string[];
+    imageUrl?: string;
+    author?: Author;
+    createdAt?: Date;
     likes: string;
     comments: string;
 }
@@ -29,4 +29,5 @@ export interface BlogResponse{
     limit?: number;
     page?: number;
     lastPage?: number;
+    query?: string;
 }

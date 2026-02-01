@@ -1,20 +1,52 @@
 'use client'
 
-import { logo, iconMenu, iconMenuClose, iconSearch, iconBlankDocument } from "@/app/asset/asset";
+import { logo, iconMenu, iconMenuClose, iconSearch } from "@/app/asset/asset";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import SearchBar from "./Searchbar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from 'motion/react';
+import { useGetSearch } from "@/app/(SearchQuery)/hooksSearchQuery";
+import SearchResultView from "./SearchResultView";
 
 const MotionButton = motion.create(Button);
 
 const Navigation = () => {
-    const windowMobile = (typeof window !== 'undefined' && window.innerWidth >= 768);
+    const [isMounted, setIsMounted] = useState(false);
     const [isOpenMenu, setIsOpenMenu] = useState(false);
     const [isOpenSearch, setIsOpenSearch] = useState(false);
-    const [isNoResultSearch, setIsNoResultSearch] = useState(true);
     const [searchText, setsetSearchText] = useState("");
+    const [triggerSearch, setTriggerSearch] = useState('')
+    const [pageSearchQuery, setPageSearchQuery] = useState(1);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setTriggerSearch(searchText);
+        }, 1000); // --> tunggu keystroke selesai supaya tidak langsung kirim query sebelum ketikan selesai
+
+        return () => clearTimeout(handler);
+    }, [searchText]);
+
+    const {
+        data: dataSearch,
+        isLoading: isLoadingSearch,
+        isFetching: isFetchingSearch
+    } = useGetSearch({
+        page: pageSearchQuery,
+        limit: 3,
+        query: triggerSearch
+    }, {
+        enabled: triggerSearch.length > 0
+    });
+
+    console.log(dataSearch, 'dataSearch');
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setIsMounted(true);
+    }, []);
+
+    const desktopMode = isMounted ? window.innerWidth >= 768 : false;
+
 
     const handleOpenMenu = () => {
         setIsOpenMenu(!isOpenMenu);
@@ -46,32 +78,25 @@ const Navigation = () => {
                 `}>
 
                     <div id="searchresult" className={`
-                        fixed top-[80.5px] left-0 w-screen h-screen bg-white
-    flex flex-col items-center justify-center
+                        fixed top-[80.5px] left-0 w-screen h-[calc(100vh-80px)] bg-white
+                        h-[calc(100vh-80px)]
+                        justify-start
+                        overflow-y-auto z-[45]
                         ${searchText == "" && 'md:hidden'}
                         `}>
-                        {
-                            isNoResultSearch && (
-                                <div className="flex flex-col gap-5 w-full max-w-[372px] mx-auto my-auto items-center justify-cente">
-                                    {
-                                        searchText != "" && (
-                                            <>
-                                                <Image src={iconBlankDocument} width={118} height={135} alt="No Result" />
-                                                <b>No result found</b>
-                                                <p>Try using different keyword</p>
-                                            </>
-                                        )
-                                    }
 
-                                    <Button onClick={handleOpenSearch} className="rounded-full w-full max-w-[214px] md:w-[182px] h-[44px]">
-                                        Back to Home
-                                    </Button>
-                                </div>
-                            )
-                        }
+                        <SearchResultView
+                            dataSearch={dataSearch ?? undefined}
+                            searchText={searchText}
+                            handleOpenSearch={handleOpenSearch}
+                            isLoadingSearch={isLoadingSearch}
+                            isFetchingSearch={isFetchingSearch}
+                            pageSearchQuery={pageSearchQuery}
+                            setPageSearchQuery={setPageSearchQuery} />
+
                     </div>
 
-                    <div className="w-full px-5 md:px-0 flex justify-center mt-4 md:mt-0">
+                    <div id="searchdiv" className="w-full px-5 md:px-0 z-55 flex justify-center md:py-0 py-3 md:mt-0 relative md:bg-transparent bg-white">
 
                         <div className={`
                                         flex flex-row items-center gap-2 
@@ -80,14 +105,17 @@ const Navigation = () => {
                                         md:max-w-[373px]
                                     `}>
                             <Image src={iconSearch} alt="search-icon" className="w-[24px] h-[24px]" />
-                            <input onChange={(e) => handleTextSearch(e.target.value)} type="text" value={searchText} placeholder="Search" className="w-full h-full" aria-label="Search Box" />
+                            <input onChange={(e) => handleTextSearch(e.target.value)} 
+                            type="text" value={searchText} 
+                            placeholder="Search" 
+                            className="w-full h-full px-2" aria-label="Search Box" />
                         </div>
 
                     </div>
                 </div>
 
                 <AnimatePresence>
-                    {(isOpenMenu || windowMobile) && (
+                    {(isOpenMenu || desktopMode) && (
                         <motion.div
                             id="buttonlogingroup"
                             className={`
