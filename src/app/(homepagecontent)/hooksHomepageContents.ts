@@ -1,5 +1,5 @@
 import { BlogResponse } from "@/types/blog";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { getRecommendations, getMostLiked } from "./apiHomepageContent";
 
@@ -8,7 +8,8 @@ export const useGetRecommendations = (params: BlogResponse) => {
         queryKey: ['recommendations', params],
         queryFn: () => getRecommendations(params),
         refetchOnWindowFocus: false,
-        staleTime: 1000 * 60 * 5
+        staleTime: 1000 * 60 * 5,
+        placeholderData: keepPreviousData
     })
 }
 

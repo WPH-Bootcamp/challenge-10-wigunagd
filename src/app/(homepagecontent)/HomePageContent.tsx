@@ -12,15 +12,15 @@ import { BlogCardNoPicSkeleton } from "@/components/BlogCardNoPicSkeleton";
 
 const HomePageContent = () => {
     const [pageQuery, setPageQuery] = useState(1);
-    const { 
-        data: dataRecommendation, 
-        isLoading: isLoadingRecommendation, 
+    const {
+        data: dataRecommendation,
+        isLoading: isLoadingRecommendation,
         isFetching: isFetchingRecommendation
     } = useGetRecommendations({ page: pageQuery, limit: 3 });
 
-    const { 
-        data: dataMostLiked, 
-        isLoading: isLoadingMostLiked, 
+    const {
+        data: dataMostLiked,
+        isLoading: isLoadingMostLiked,
         isFetching: isFetchingMostLiked
     } = useGetMostLiked({ page: pageQuery, limit: 3 });
 
@@ -53,30 +53,30 @@ const HomePageContent = () => {
 
                 <div className="w-full flex flex-col relative">
 
-                    {(isLoadingRecommendation || isFetchingRecommendation) && (
-                        <BlogCardSkeleton />
-                    )}
-
                     {
-                        dataRecommendation?.data?.map((post) => (
-                            <BlogCard
-                                key={post.id}
-                                id={post.id}
-                                title={post.title}
-                                content={post.content}
-                                tags={post.tags}
-                                imageUrl={post.imageUrl}
-                                author={post.author}
-                                createdAt={post.createdAt}
-                                likes={post.likes}
-                                comments={post.comments}
-                            />
-                        ))
+                        (isLoadingRecommendation || isFetchingRecommendation) ? (
+                            <BlogCardSkeleton />
+                        ) : (
+                            dataRecommendation?.data?.map((post) => (
+                                <BlogCard
+                                    key={post.id}
+                                    id={post.id}
+                                    title={post.title}
+                                    content={post.content}
+                                    tags={post.tags}
+                                    imageUrl={post.imageUrl}
+                                    author={post.author}
+                                    createdAt={post.createdAt}
+                                    likes={post.likes}
+                                    comments={post.comments}
+                                />
+                            ))
+                        )
                     }
                 </div>
 
-                {maxPageRecommendation > 1 && (
-                    <div className="flex flex-row w-full justify-center items-center my-2 gap-2">
+                {(!isLoadingRecommendation && maxPageRecommendation > 1) && (
+                    <div id="pagination" className="flex flex-row w-full justify-center items-center my-2 gap-2">
 
                         <Button
                             disabled={pageQuery === 1}
