@@ -76,7 +76,9 @@ const HomePageContent = () => {
                 </div>
 
                 {(!isLoadingRecommendation && maxPageRecommendation > 1) && (
-                    <div id="pagination" className="flex flex-row w-full justify-center items-center my-2 gap-2">
+                    <div id="pagination" 
+                    className={`flex flex-row w-full justify-center items-center my-2 gap-2 
+                    ${isFetchingRecommendation ? 'opacity-50 pointer-events-none' : ''}`}>
 
                         <Button
                             disabled={pageQuery === 1}
