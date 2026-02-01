@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from 'motion/react';
 import { useGetSearch } from "@/app/(SearchQuery)/hooksSearchQuery";
 import SearchResultView from "./SearchResultView";
-import { siteBaseUrl } from "@/lib/siteBaseUrl";
 import Link from "next/link";
 
 const MotionButton = motion.create(Button);
