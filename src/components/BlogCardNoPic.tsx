@@ -1,15 +1,16 @@
 import Image from "next/image";
-import { iconLike, iconComment } from "@/app/asset/asset";
+import { iconLike, iconComment } from "../../public/asset/asset";
 import { BlogPost } from "@/types/blog";
 import { stripHtml } from "@/lib/ctripHtmlTags";
+import Link from "next/link";
 
 const BlogCardNoPic = ({ id, title, content, likes, comments }: BlogPost) => {
     return (
         <div className="flex flex-row w-full gap-4 border-b-2 py-7" id={(id ?? "").toString()}>
             <div className="w-full flex flex-col gap-3">
-                <h2 className="text-xl font-bold">{title}</h2>
+                <Link href={`/post/${id}`} className="text-xl font-bold">{title}</Link>
                 <div className="text-ellipsis text-sm line-clamp-2">
-                    {stripHtml(content)}
+                    {stripHtml(content ?? "")}
                 </div>
                 <div className="flex flex-row gap-5 items-center">
                     <span className="flex items-center gap-2 text-sm">

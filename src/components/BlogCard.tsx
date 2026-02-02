@@ -1,14 +1,15 @@
 import Image from "next/image";
-import { tmpBlogimg, tmpProfilePicture, iconLike, iconComment } from "@/app/asset/asset";
+import { tmpBlogimg, tmpProfilePicture, iconLike, iconComment } from "../../public/asset/asset";
 import { BlogPost } from "@/types/blog";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import { formattedDate } from "@/lib/formatDate";
 import { stripHtml } from "@/lib/ctripHtmlTags";
+import Link from "next/link";
 
 const BlogCard = ({ id, title, content, tags, imageUrl, author, createdAt, likes, comments }: BlogPost) => {
     return (
         <div className="flex flex-row w-full gap-4 border-b-2 py-7" id={(id ?? "").toString()}>
-            <div className="hidden md:block md:w-1/4">
+            <Link href={`/post/${id}`} className="hidden md:block md:w-1/4">
                 <AspectRatio ratio={4 / 3.1}>
                     <Image
                         src={imageUrl || tmpBlogimg}
@@ -17,9 +18,9 @@ const BlogCard = ({ id, title, content, tags, imageUrl, author, createdAt, likes
                         className="rounded-sm object-cover"
                     />
                 </AspectRatio>
-            </div>
+            </Link>
             <div className="w-full md:w-3/4 flex flex-col gap-3">
-                <h2 className="text-xl font-bold">{title}</h2>
+                <Link href={`/post/${id}`} className="text-xl font-bold">{title}</Link>
                 <div className="flex flex-row flex-wrap gap-2">
                     {
                         tags?.map((tag) => (
@@ -28,10 +29,10 @@ const BlogCard = ({ id, title, content, tags, imageUrl, author, createdAt, likes
                     }
                 </div>
                 <div className="text-ellipsis text-sm line-clamp-2">
-                    {stripHtml(content)}
+                    {stripHtml(content ?? '')}
                 </div>
                 <div className="flex flex-row items-center gap-2 text-sm">
-                    <Image src={tmpProfilePicture} width={40} height={40} alt="Profile-Img" className="rounded-full" />
+                    <Image src={author?.avatarUrl ?? tmpProfilePicture} width={40} height={40} alt="Profile-Img" className="rounded-full" />
                     <b>{author?.name ?? 'John Doe'}</b> &middot; {createdAt && (<span>{formattedDate(createdAt, 'DD MMMM YYYY')}</span>)}
                 </div>
                 <div className="flex flex-row gap-5 items-center">

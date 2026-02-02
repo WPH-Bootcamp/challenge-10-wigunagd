@@ -1,4 +1,4 @@
-import { iconBlankDocument, iconPageNext, iconPagePrevious } from "@/app/asset/asset";
+import { iconBlankDocument, iconPageNext, iconPagePrevious } from "../../public/asset/asset";
 import { Button } from "./ui/button";
 import Image from "next/image";
 import { BlogResponse } from "@/types/blog";

@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { iconSearch } from "@/app/asset/asset"
+import { iconSearch } from "../../public/asset/asset"
 
 const SearchBar = ({className} : {className?: string}) => {
     return (

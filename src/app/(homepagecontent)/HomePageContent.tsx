@@ -6,7 +6,7 @@ import { useGetRecommendations, useGetMostLiked } from "./hooksHomepageContents"
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { iconPagePrevious, iconPageNext } from "../asset/asset";
+import { iconPagePrevious, iconPageNext } from "../../../public/asset/asset";
 import { BlogCardSkeleton } from "@/components/BlogCardSkeleton";
 import { BlogCardNoPicSkeleton } from "@/components/BlogCardNoPicSkeleton";
 

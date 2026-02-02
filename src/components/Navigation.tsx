@@ -1,6 +1,6 @@
 'use client'
 
-import { logo, iconMenu, iconMenuClose, iconSearch } from "@/app/asset/asset";
+import { logo, iconMenu, iconMenuClose, iconSearch } from "../../public/asset/asset";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
