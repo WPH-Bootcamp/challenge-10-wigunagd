@@ -114,11 +114,11 @@ const Detail = () => {
                     <div className="flex gap-1 items-center">
                       Please
                       <Button variant={'link'} asChild className="font-bold underline p-0">
-                        <a href="/login">Login</a>
+                        <a href={`/login?redirect=post/${id}`}>Login</a>
                       </Button>
                       or
                       <Button variant={'link'} asChild className="font-bold underline p-0">
-                        <a href="/register">Register</a>
+                        <a href={`/register?redirect=post/${id}`}>Register</a>
                       </Button>
                       to write a comment
                     </div>

@@ -1,5 +1,4 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 const PostCommentSkeleton = () => {
   return (

@@ -13,6 +13,7 @@ const MotionButton = motion.create(Button);
 
 const Navigation = () => {
     const [isMounted, setIsMounted] = useState(false);
+    const [desktopMode, setDesktopMode] = useState(false);
     const [isOpenMenu, setIsOpenMenu] = useState(false);
     const [isOpenSearch, setIsOpenSearch] = useState(false);
     const [searchText, setsetSearchText] = useState("");
@@ -27,6 +28,19 @@ const Navigation = () => {
         return () => clearTimeout(handler);
     }, [searchText]);
 
+    // console.log(dataSearch, 'dataSearch');
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setIsMounted(true);
+
+        const checkIsDesktop = () => setDesktopMode(window.innerWidth >= 768);
+
+        checkIsDesktop();
+        window.addEventListener('resize', checkIsDesktop);
+        return () => window.removeEventListener('resize', checkIsDesktop);
+    }, []);
+
     const {
         data: dataSearch,
         isLoading: isLoadingSearch,
@@ -38,15 +52,6 @@ const Navigation = () => {
     }, {
         enabled: triggerSearch.length > 0
     });
-
-    console.log(dataSearch, 'dataSearch');
-
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setIsMounted(true);
-    }, []);
-
-    const desktopMode = isMounted ? window.innerWidth >= 768 : false;
 
 
     const handleOpenMenu = () => {
@@ -70,7 +75,7 @@ const Navigation = () => {
                 <div className="flex">
                     <Link href="/" className="flex md:text-2xl text-lg font-semibold items-center gap-2 shrink-0">
                         <Image src={logo} alt="Logo" width={36} height={36} priority />
-                    Your Logo
+                        Your Logo
                     </Link>
                 </div>
 
@@ -108,17 +113,17 @@ const Navigation = () => {
                                         md:max-w-[373px]
                                     `}>
                             <Image src={iconSearch} alt="search-icon" className="w-[24px] h-[24px]" />
-                            <input onChange={(e) => handleTextSearch(e.target.value)} 
-                            type="text" value={searchText} 
-                            placeholder="Search" 
-                            className="w-full h-full px-2" aria-label="Search Box" />
+                            <input onChange={(e) => handleTextSearch(e.target.value)}
+                                type="text" value={searchText}
+                                placeholder="Search"
+                                className="w-full h-full px-2" aria-label="Search Box" />
                         </div>
 
                     </div>
                 </div>
 
                 <AnimatePresence>
-                    {(isOpenMenu || desktopMode) && (
+                    {isMounted && (isOpenMenu || desktopMode) && (
                         <motion.div
                             id="buttonlogingroup"
                             className={`
@@ -146,7 +151,7 @@ const Navigation = () => {
 
                 <div className="md:hidden flex gap-3 items-center">
                     <AnimatePresence>
-                        {(!isOpenMenu && !isOpenSearch) && (
+                        {isMounted && (!isOpenMenu && !isOpenSearch) && (
                             <MotionButton
                                 key="buttonopensearch"
                                 id="buttonopensearch"
@@ -167,28 +172,27 @@ const Navigation = () => {
                     </AnimatePresence>
 
                     <AnimatePresence mode="wait">
-                        <MotionButton
-                            key={isOpenMenu ? "close" : "open"}
-                            onClick={handleOpenMenu}
-                            variant="ghost"
-                            size="icon"
-                            whileTap={{ scale: 0.9 }}
-                            initial={{ opacity: 0, rotate: 45 }}
-                            animate={{ opacity: 1, rotate: 0 }}
-                            exit={{ opacity: 0, rotate: -45 }}
-                            transition={{
-                                duration: 0.1,
-                                ease: 'easeOut'
-                            }}
-                        >
-                            <Image
-                                src={isOpenMenu ? iconMenuClose : iconMenu}
-                                alt="Menu"
-                                width={24}
-                                height={24}
-                            />
-                        </MotionButton>
+                        {isMounted && (
+                            <MotionButton
+                                key={isOpenMenu ? "close" : "open"}
+                                onClick={handleOpenMenu}
+                                variant="ghost"
+                                size="icon"
+                                whileTap={{ scale: 0.9 }}
+                                initial={{ opacity: 0, rotate: 45 }}
+                                animate={{ opacity: 1, rotate: 0 }}
+                                exit={{ opacity: 0, rotate: -45 }}
+                            >
+                                <Image
+                                    src={isOpenMenu ? iconMenuClose : iconMenu}
+                                    alt="Menu"
+                                    width={24}
+                                    height={24}
+                                />
+                            </MotionButton>
+                        )}
                     </AnimatePresence>
+                    
                 </div>
             </nav>
         </header>

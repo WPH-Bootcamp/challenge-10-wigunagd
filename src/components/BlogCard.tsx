@@ -7,6 +7,7 @@ import { stripHtml } from "@/lib/ctripHtmlTags";
 import Link from "next/link";
 
 const BlogCard = ({ id, title, content, tags, imageUrl, author, createdAt, likes, comments }: BlogPost) => {
+    
     return (
         <div className="flex flex-row w-full gap-4 border-b-2 py-7" id={(id ?? "").toString()}>
             <Link href={`/post/${id}`} className="hidden md:block md:w-1/4">

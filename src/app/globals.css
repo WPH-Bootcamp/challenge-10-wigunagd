@@ -3,6 +3,78 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  /* Fonts */
+  --font-inter: "Inter", ui-sans-serif, system-ui;
+
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* Display 3xl */
+  --text-display-3xl: 3.75rem;
+  --text-display-3xl--line-height: 4.5rem;
+  --text-display-3xl--letter-spacing: -0.03em;
+
+  /* Display 2xl */
+  --text-display-2xl: 3rem;
+  --text-display-2xl--line-height: 3.75rem;
+  --text-display-2xl--letter-spacing: -0.03em;
+
+  /* Display xl */
+  --text-display-xl: 2.5rem;
+  --text-display-xl--line-height: 3rem;
+  --text-display-xl--letter-spacing: -0.03em;
+
+  /* Display lg */
+  --text-display-lg: 2.25rem;
+  --text-display-lg--line-height: 2.75rem;
+  --text-display-lg--letter-spacing: -0.03em;
+
+  /* Display md */
+  --text-display-md: 2rem;
+  --text-display-md--line-height: 2.5rem;
+  --text-display-md--letter-spacing: -0.03em;
+
+  /* Display sm */
+  --text-display-sm: 1.75rem;
+  --text-display-sm--line-height: 2.375rem;
+  --text-display-sm--letter-spacing: -0.03em;
+
+  /* Display xs */
+  --text-display-xs: 1.5rem;
+  --text-display-xs--line-height: 2.25rem;
+  --text-display-xs--letter-spacing: -0.03em;
+
+  /* Text xl */
+  --text-text-xl: 1.25rem;
+  --text-text-xl--line-height: 2.125rem;
+  --text-text-xl--letter-spacing: -0.03em;
+
+  /* Text lg */
+  --text-text-lg: 1.125rem;
+  --text-text-lg--line-height: 2rem;
+  --text-text-lg--letter-spacing: -0.03em;
+
+  /* Text md */
+  --text-text-md: 1rem;
+  --text-text-md--line-height: 1.875rem;
+  --text-text-md--letter-spacing: -0.03em;
+
+  /* Text sm */
+  --text-text-sm: 0.875rem;
+  --text-text-sm--line-height: 1.75rem;
+  --text-text-sm--letter-spacing: -0.03em;
+
+  /* Text xs */
+  --text-text-xs: 0.75rem;
+  --text-text-xs--line-height: 1.5rem;
+  --text-text-xs--letter-spacing: -0.03em;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -126,6 +198,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
