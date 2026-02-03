@@ -2,14 +2,13 @@
 
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { useDoComment, useGetPostDetail, useGetPostDetailComment } from "./hooksDetail";
+import { useDoComment, useGetPostAuthorDetail, useGetPostDetail, useGetPostDetailComment } from "./hooksDetail";
 import { useParams, usePathname } from "next/navigation";
 import Image from "next/image";
 import { iconComment, iconLike, tmpBlogimg, tmpProfilePicture } from "../../../../public/asset/asset";
 import { formattedDate } from "@/lib/formatDate";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import { Button } from "@/components/ui/button";
-import { API_BASE_URL } from "@/lib/api";
 import { useGetRecommendations } from "@/app/(homepagecontent)/hooksHomepageContents";
 import { BlogCardSkeleton } from "@/components/BlogCardSkeleton";
 import BlogCard from "@/components/BlogCard";
@@ -46,6 +45,7 @@ const Detail = () => {
 
   const { data: dataPostDetail, isLoading: isLoadingPostDetail, isFetching: isFetchingPostDetail } = useGetPostDetail({ id: Number(id) });
   const { data: dataComments, isLoading: isLoadingComments, isFetching: isFetchingComments } = useGetPostDetailComment(Number(id));
+  const { data: dataAuthor } = useGetPostAuthorDetail(Number(dataPostDetail?.author?.id));
 
   const {
     data: dataRecommendation,
@@ -102,7 +102,7 @@ const Detail = () => {
               </div>
 
               <div className="flex flex-row items-center gap-2 text-sm">
-                <Image src={dataPostDetail?.author?.avatarUrl ?? tmpProfilePicture} width={40} height={40} alt="Profile-Img" className="rounded-full" />
+                <Image src={dataAuthor?.avatarUrl ?? tmpProfilePicture} width={40} height={40} alt="Profile-Img" className="rounded-full w-10 h-10" />
                 <b>{dataPostDetail?.author?.name ?? 'John Doe'}</b> &middot; {dataPostDetail?.createdAt && (<span>{formattedDate(dataPostDetail?.createdAt, 'DD MMMM YYYY')}</span>)}
               </div>
 
@@ -162,7 +162,7 @@ const Detail = () => {
                   <div className="grid items-center w-full gap-2">
                     <div className="h-auto py-1 flex items-center gap-3">
                       <div className="flex items-center justify-center w-10 h-10 border rounded-full overflow-hidden">
-                        <Image src={meState.avatarUrl ?? tmpProfilePicture} alt="profile" />
+                        <Image src={meState.avatarUrl ?? tmpProfilePicture} alt="profile" width={40} height={40} className="w-10 h-10" />
                       </div>
                       <span className="font-semibold">{meState.name}</span>
                     </div>
@@ -191,20 +191,20 @@ const Detail = () => {
 
                 <div className="grid w-full justify-start">
 
-                  {dataComments && dataComments.length > 0 ? (
+                  {dataComments && dataComments.length > 0 && (
                     dataComments?.slice(0, 3).map((comment) => (
                       <div key={comment.id}
                         className="grid border-t py-3 text-sm gap-3">
                         <div className="flex gap-2 items-center">
                           <Image
                             src={comment.author.avatarUrl
-                              ? `${API_BASE_URL}${comment.author.avatarUrl}`
+                              ? `${comment.author.avatarUrl}`
                               : tmpProfilePicture
                             }
                             alt={comment.author.name}
                             width={40}
                             height={40}
-                            className="rounded-full object-cover"
+                            className="rounded-full object-cover w-10 h-10"
                           />
                           <div className="grid gap-2">
                             <b>{comment.author.name}</b>
@@ -214,10 +214,6 @@ const Detail = () => {
                         <p>{comment.content}</p>
                       </div>
                     ))
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground italic">
-                      No comments yet. Be the first to share your thoughts!
-                    </div>
                   )}
 
                   {(dataComments?.length ?? 0) > 0 && (
@@ -269,20 +265,20 @@ const Detail = () => {
                             id="commentInDialog"
                             className="flex-1 overflow-y-auto px-6 no-scrollbar bg-gray-50/30"
                           >
-                            {dataComments && dataComments.length > 0 ? (
+                            {dataComments && dataComments.length > 0 && (
                               dataComments?.map((comment) => (
                                 <div key={comment.id}
                                   className="grid border-t py-3 text-sm gap-3">
                                   <div className="flex gap-2 items-center">
                                     <Image
                                       src={comment.author.avatarUrl
-                                        ? `${API_BASE_URL}${comment.author.avatarUrl}`
+                                        ? `${comment.author.avatarUrl}`
                                         : tmpProfilePicture
                                       }
                                       alt={comment.author.name}
                                       width={40}
                                       height={40}
-                                      className="rounded-full object-cover"
+                                      className="rounded-full object-cover w-10 h-10"
                                     />
                                     <div className="grid gap-2">
                                       <b>{comment.author.name}</b>
@@ -292,10 +288,6 @@ const Detail = () => {
                                   <p>{comment.content}</p>
                                 </div>
                               ))
-                            ) : (
-                              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground italic">
-                                No comments yet. Be the first to share your thoughts!
-                              </div>
                             )}
                           </div>
                         </DialogContent>

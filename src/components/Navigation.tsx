@@ -191,7 +191,7 @@ const Navigation = () => {
                                 <DropdownMenuTrigger asChild>
                                     <Button variant={'ghost'} className="h-auto py-1 flex items-center gap-3">
                                         <div className="flex items-center justify-center w-10 h-10 border rounded-full overflow-hidden">
-                                            <Image src={dataMe?.avatarUrl ?? tmpProfilePicture} alt="profile" />
+                                            <Image src={dataMe?.avatarUrl ?? tmpProfilePicture} alt="profile" width={40} height={40} className="w-10 h-10" />
                                         </div>
                                         <span className="hidden md:inline">{dataMe?.name}</span>
                                     </Button>

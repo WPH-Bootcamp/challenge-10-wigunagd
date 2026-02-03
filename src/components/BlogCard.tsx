@@ -5,9 +5,19 @@ import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import { formattedDate } from "@/lib/formatDate";
 import { stripHtml } from "@/lib/ctripHtmlTags";
 import Link from "next/link";
+import { useGetPostAuthorDetail } from "@/app/detail/[id]/hooksDetail";
+import { Button } from "./ui/button";
 
-const BlogCard = ({ id, title, content, tags, imageUrl, author, createdAt, likes, comments }: BlogPost) => {
-    
+type BlogCardActionProps = {
+    action?: boolean;
+    onStatisticClick?: (id: number, openDialog: boolean) => void;
+}
+type BlogCardProps = BlogPost & BlogCardActionProps;
+
+const BlogCard = ({ id, title, content, tags, imageUrl, author, createdAt, likes, comments, action, onStatisticClick }: BlogCardProps) => {
+
+    const { data: dataAuthor } = useGetPostAuthorDetail(Number(author?.id));
+
     return (
         <div className="flex flex-row w-full gap-4 border-b-2 py-7" id={(id ?? "").toString()}>
             <Link href={`/detail/${id}`} className="hidden md:block md:w-1/4">
@@ -25,40 +35,70 @@ const BlogCard = ({ id, title, content, tags, imageUrl, author, createdAt, likes
                 <div className="flex flex-row flex-wrap gap-2">
                     {
                         tags?.map((tag) => (
-                            <span key={tag} className="p-2 border-1 rounded-lg">{tag}</span>
+                            <span key={tag} className="p-2 border rounded-lg text-xs">{tag}</span>
                         ))
                     }
                 </div>
                 <div className="text-ellipsis text-sm line-clamp-2">
                     {stripHtml(content ?? '')}
                 </div>
-                <div className="flex flex-row items-center gap-2 text-sm">
-                    <Image src={author?.avatarUrl ?? tmpProfilePicture} width={40} height={40} alt="Profile-Img" className="rounded-full" />
-                    <b>{author?.name ?? 'John Doe'}</b> &middot; {createdAt && (<span>{formattedDate(createdAt, 'DD MMMM YYYY')}</span>)}
-                </div>
-                <div className="flex flex-row gap-5 items-center">
-                    <span className="flex items-center gap-2 text-sm">
-                        <Image
-                            src={iconLike}
-                            width={20}
-                            height={20}
-                            alt="Icon Like"
-                            className="shrink-0 object-contain"
-                        />
-                        {likes}
-                    </span>
 
-                    <span className="flex items-center gap-2 text-sm">
-                        <Image
-                            src={iconComment}
-                            width={20}
-                            height={20}
-                            alt="Icon Comment"
-                            className="shrink-0 object-contain"
-                        />
-                        {comments}
-                    </span>
-                </div>
+                {!action && (
+                    <div className="flex flex-row items-center gap-2 text-sm">
+                        <Image src={dataAuthor?.avatarUrl ?? tmpProfilePicture} width={40} height={40} alt="Profile-Img" className="rounded-full w-10 h-10" />
+                        <b>{author?.name ?? '...'}</b> &middot; {createdAt && (<span>{formattedDate(createdAt, 'DD MMMM YYYY')}</span>)}
+                    </div>
+                )}
+
+                {!action && (
+                    <div className="flex flex-row gap-5 items-center">
+                        <span className="flex items-center gap-2 text-sm">
+                            <Image
+                                src={iconLike}
+                                width={20}
+                                height={20}
+                                alt="Icon Like"
+                                className="shrink-0 object-contain"
+                            />
+                            {likes}
+                        </span>
+
+                        <span className="flex items-center gap-2 text-sm">
+                            <Image
+                                src={iconComment}
+                                width={20}
+                                height={20}
+                                alt="Icon Comment"
+                                className="shrink-0 object-contain"
+                            />
+                            {comments}
+                        </span>
+                    </div>
+                )}
+
+                {action && (
+                    <div className="flex flex-row gap-5 items-center">
+                        <span className="flex items-center gap-2 text-xs">Created {createdAt && (`${formattedDate(createdAt, 'DD MMM YYYY hh:mm')}`)}</span>
+                        <span className="flex items-center gap-2 text-xs border-l pl-4">Last updated {createdAt && (`${formattedDate(createdAt, 'DD MMM YYYY hh:mm')}`)}</span>
+                    </div>
+                )}
+
+                {action && (
+                    <div className="flex flex-row items-center gap-3">
+                        <Button 
+                        onClick={() => id && onStatisticClick?.(id, true)}
+                        variant={'link'} className="underline px-0">
+                            Statistic
+                        </Button>
+                        <Button variant={'link'} asChild className="underline border-l border-r rounded-none">
+                            <a href={`/edit/${id}`}>Edit</a>
+                        </Button>
+                        <Button variant={'link'} className="underline px-0 text-destructive">
+                            Delete
+                        </Button>
+                    </div>
+                )}
+
             </div>
         </div>
     )

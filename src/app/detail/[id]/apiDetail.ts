@@ -6,6 +6,11 @@ export const getPostDetail = async ({id}: BlogPost) => {
     return response.data;
 }
 
+export const getPostAuthorDetail = async (id: string | number) => {
+    const response = await apiAxios.get(`/users/${id}`);
+    return response.data;
+}
+
 export const getPostDetailComment = async (id: string | number): Promise<CommentListResponse> => {
     const response = await apiAxios.get(`/posts/${id}/comments`);
     return response.data;

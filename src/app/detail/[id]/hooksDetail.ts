@@ -1,12 +1,19 @@
-import { BlogPost, CommentListResponse, CommentSendBody, CommentSendResponse } from "@/types/blog";
+import { BlogPost, CommentListResponse, CommentSendBody, CommentSendResponse, UserProfileResponse } from "@/types/blog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { AxiosError } from "axios";
-import { doComment, getPostDetail, getPostDetailComment } from "./apiDetail";
+import { doComment, getPostAuthorDetail, getPostDetail, getPostDetailComment } from "./apiDetail";
 
 export const useGetPostDetail = (params: BlogPost) => {
     return useQuery<BlogPost, AxiosError>({
         queryKey: ['detail'],
         queryFn: () => getPostDetail(params)
+    });
+}
+
+export const useGetPostAuthorDetail = (id: number) => {
+    return useQuery<UserProfileResponse, AxiosError>({
+        queryKey: ['authordetail', id],
+        queryFn: () => getPostAuthorDetail(id)
     });
 }
 

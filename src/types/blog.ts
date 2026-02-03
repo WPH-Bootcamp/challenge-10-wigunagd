@@ -35,6 +35,17 @@ export interface BlogResponse {
     query?: string;
 }
 
+// author/user profile
+export interface UserProfileResponse {
+  id: number;
+  name?: string;
+  email?: string;
+  username?: string;
+  headline?: string;
+  avatarUrl?: string;
+  avatarPublicId?: string;
+}
+
 // comment
 export interface Author {
     id: number;
