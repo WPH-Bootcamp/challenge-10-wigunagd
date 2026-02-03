@@ -19,13 +19,12 @@ import { useDoLogin } from "./hooksLogin";
 import { Spinner } from "@/components/ui/spinner";
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/redux/3_redux";
-import { toast } from "sonner";
 
 const Login = () => {
     const searchParams = useSearchParams();
     const redirectPath = searchParams.get('redirect');
     const destination = redirectPath
-        ? `/${redirectPath}`
+        ? (redirectPath.startsWith('/') ? redirectPath : `/${redirectPath}`)
         : '/';
 
     const [email, setEmail] = useState("");
@@ -33,6 +32,7 @@ const Login = () => {
     const [passwd, setPasswd] = useState("");
     const [passwdValid, setPasswdValid] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
+    const [loginGagal, setLoginGagal] = useState(false);
 
     const router = useRouter();
     const authState = useAppSelector((state) => state.auth);
@@ -55,6 +55,7 @@ const Login = () => {
     const onLogin = () => {
         const isEmailValid = email.length > 0;
         const isPasswdValid = passwd.length > 0;
+        setLoginGagal(false);
 
         setEmailValid(isEmailValid);
         setPasswdValid(isPasswdValid);
@@ -68,10 +69,15 @@ const Login = () => {
                     router.push(destination);
                 },
                 onError: () => {
-                    toast.error('Login gagal, periksa kembali email dan password');
+                    setLoginGagal(true);
                 }
             })
         }
+    }
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onLogin();
     }
 
     useEffect(() => {
@@ -87,72 +93,75 @@ const Login = () => {
                     <CardTitle className="text-xl font-bold">Sign In</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-5">
-                    <div className="grid gap-4">
-                        <Label htmlFor="email" className="text-sm">Email</Label>
-                        <Field data-invalid={!emailValid}>
-                            <Input
-                                id="email"
-                                type="email"
-                                placeholder="Enter your email"
-                                className="pr-10 h-12 rounded-xl text-sm"
-                                required
-                                onChange={(e) => handleEmail(e.target.value)}
-                                value={email}
-                                aria-invalid={!emailValid}
-                            />
-                            {!emailValid && (<FieldLabel className="text-xs colorerrormsg" htmlFor="input-invalid">Email required</FieldLabel>)}
-                        </Field>
-                    </div>
-
-                    <div className="grid gap-4">
-                        <div className="flex items-center justify-between">
-                            <Label htmlFor="password" className="text-sm">Password</Label>
-                        </div>
-                        <Field data-invalid={!passwdValid}>
-                            <div className="relative">
+                    <form onSubmit={handleSubmit} className="grid gap-5">
+                        <div className="grid gap-4">
+                            <Label htmlFor="email" className="text-sm">Email</Label>
+                            <Field data-invalid={!emailValid}>
                                 <Input
-                                    id="password"
-                                    type={showPassword ? "text" : "password"}
-                                    placeholder="Enter your password"
+                                    id="email"
+                                    type="email"
+                                    placeholder="Enter your email"
                                     className="pr-10 h-12 rounded-xl text-sm"
                                     required
-                                    onChange={(e) => handlePassword(e.target.value)}
-                                    value={passwd}
-                                    aria-invalid={!passwdValid}
+                                    onChange={(e) => handleEmail(e.target.value)}
+                                    value={email}
+                                    aria-invalid={!emailValid}
                                 />
-                                <button
-                                    type="button"
-                                    onClick={togglePasswordVisibility}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 focus:outline-none hover:opacity-70 transition-opacity"
-                                    aria-label={showPassword ? "Hide password" : "Show password"}
-                                >
-                                    <Image
-                                        src={showPassword ? iconEyeOff : iconEye}
-                                        alt="Toggle Visibility"
-                                        width={20}
-                                        height={20}
-                                    />
-                                </button>
-                            </div>
-                            {!passwdValid && (<FieldLabel className="text-xs colorerrormsg" htmlFor="input-invalid">Password required</FieldLabel>)}
-                        </Field>
-                    </div>
-
-                    <div className="grid gap-4">
-                        <Button
-                            disabled={isPending}
-                            onClick={onLogin}
-                            className="w-full rounded-full h-12 text-sm">{isPending && (<Spinner />)} Sign In</Button>
-                        <div className="text-sm text-center text-muted-foreground">
-                            Don`t have an account?{" "}
-                            <Link
-                                href={`/register${redirectPath ? (`?redirect=${redirectPath}`) : ('')}`}
-                                className="text-primary font-semibold hover:underline"
-                            >
-                                Register
-                            </Link>
+                                {!emailValid && (<FieldLabel className="text-xs colorerrormsg" htmlFor="input-invalid">Email required</FieldLabel>)}
+                            </Field>
                         </div>
-                    </div>
+
+                        <div className="grid gap-4">
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="password" className="text-sm">Password</Label>
+                            </div>
+                            <Field data-invalid={!passwdValid}>
+                                <div className="relative">
+                                    <Input
+                                        id="password"
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="Enter your password"
+                                        className="pr-10 h-12 rounded-xl text-sm"
+                                        required
+                                        onChange={(e) => handlePassword(e.target.value)}
+                                        value={passwd}
+                                        aria-invalid={!passwdValid}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={togglePasswordVisibility}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 focus:outline-none hover:opacity-70 transition-opacity"
+                                        aria-label={showPassword ? "Hide password" : "Show password"}
+                                    >
+                                        <Image
+                                            src={showPassword ? iconEyeOff : iconEye}
+                                            alt="Toggle Visibility"
+                                            width={20}
+                                            height={20}
+                                        />
+                                    </button>
+                                </div>
+                                {!passwdValid && (<FieldLabel className="text-xs colorerrormsg" htmlFor="input-invalid">Password required</FieldLabel>)}
+                            </Field>
+                        </div>
+
+                        <div className="grid gap-4">
+                            {loginGagal && (<FieldLabel className="text-xs colorerrormsg" htmlFor="input-invalid">Login gagal. Periksa kembali email dan password.</FieldLabel>)}
+                            <Button
+                                disabled={isPending}
+                                onClick={onLogin}
+                                className="w-full rounded-full h-12 text-sm">{isPending && (<Spinner />)} Sign In</Button>
+                            <div className="text-sm text-center text-muted-foreground">
+                                Don`t have an account?{" "}
+                                <Link
+                                    href={`/register${redirectPath ? (`?redirect=${redirectPath}`) : ('')}`}
+                                    className="text-primary font-semibold hover:underline"
+                                >
+                                    Register
+                                </Link>
+                            </div>
+                        </div>
+                    </form>
 
                 </CardContent>
             </Card>

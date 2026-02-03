@@ -10,7 +10,7 @@ const BlogCard = ({ id, title, content, tags, imageUrl, author, createdAt, likes
     
     return (
         <div className="flex flex-row w-full gap-4 border-b-2 py-7" id={(id ?? "").toString()}>
-            <Link href={`/post/${id}`} className="hidden md:block md:w-1/4">
+            <Link href={`/detail/${id}`} className="hidden md:block md:w-1/4">
                 <AspectRatio ratio={4 / 3.1}>
                     <Image
                         src={imageUrl || tmpBlogimg}
@@ -21,7 +21,7 @@ const BlogCard = ({ id, title, content, tags, imageUrl, author, createdAt, likes
                 </AspectRatio>
             </Link>
             <div className="w-full md:w-3/4 flex flex-col gap-3">
-                <Link href={`/post/${id}`} className="text-xl font-bold">{title}</Link>
+                <Link href={`/detail/${id}`} className="text-xl font-bold">{title}</Link>
                 <div className="flex flex-row flex-wrap gap-2">
                     {
                         tags?.map((tag) => (

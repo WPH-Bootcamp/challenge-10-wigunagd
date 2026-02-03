@@ -19,7 +19,6 @@ import { logout } from "@/redux/1_authSlice";
 import { useGetMe } from "@/app/(getme)/hooksGetMe";
 import { setMeData } from "@/redux/1_meSlice";
 
-
 const MotionButton = motion.create(Button);
 
 const Navigation = () => {
@@ -188,7 +187,7 @@ const Navigation = () => {
                                 </Link>
                             </Button>
 
-                            <DropdownMenu key={`dropdownMenuProfile`}>
+                            <DropdownMenu modal={false} key={`dropdownMenuProfile`}>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant={'ghost'} className="h-auto py-1 flex items-center gap-3">
                                         <div className="flex items-center justify-center w-10 h-10 border rounded-full overflow-hidden">
@@ -200,7 +199,7 @@ const Navigation = () => {
 
                                 <DropdownMenuContent className="w-[182px] mt-1 rounded-lg grid gap-4 p-2" align="end">
                                     <DropdownMenuItem asChild>
-                                        <Link href="/profile" className="flex gap-2 cursor-pointer">
+                                        <Link href="/myprofile" className="flex gap-2 cursor-pointer">
                                             <Image src={iconUser} width={20} height={20} alt="profile" />Profile
                                         </Link>
                                     </DropdownMenuItem>

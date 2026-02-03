@@ -8,7 +8,7 @@ const BlogCardNoPic = ({ id, title, content, likes, comments }: BlogPost) => {
     return (
         <div className="flex flex-row w-full gap-4 border-b-2 py-7" id={(id ?? "").toString()}>
             <div className="w-full flex flex-col gap-3">
-                <Link href={`/post/${id}`} className="text-xl font-bold">{title}</Link>
+                <Link href={`/detail/${id}`} className="text-xl font-bold">{title}</Link>
                 <div className="text-ellipsis text-sm line-clamp-2">
                     {stripHtml(content ?? "")}
                 </div>

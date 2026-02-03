@@ -3,7 +3,7 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useDoComment, useGetPostDetail, useGetPostDetailComment } from "./hooksDetail";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import Image from "next/image";
 import { iconComment, iconLike, tmpBlogimg, tmpProfilePicture } from "../../../../public/asset/asset";
 import { formattedDate } from "@/lib/formatDate";
@@ -34,6 +34,7 @@ const Detail = () => {
 
   const params = useParams();
   const id = params?.id as string;
+  const pathname = usePathname();
 
   const authState = useAppSelector((state) => state.auth);
   const meState = useAppSelector((state) => state.me);
@@ -117,7 +118,7 @@ const Detail = () => {
                   {dataPostDetail?.likes}
                 </span>
 
-                <span className="flex items-center gap-2 text-sm">
+                <a href="#" onClick={() => setIsDialogCommentOpen(!isDialogCommentOpen)} className="flex items-center gap-2 text-sm">
                   <Image
                     src={iconComment}
                     width={20}
@@ -125,8 +126,8 @@ const Detail = () => {
                     alt="Icon Comment"
                     className="shrink-0 object-contain"
                   />
-                  {dataPostDetail?.comments}
-                </span>
+                  {dataComments?.length}
+                </a>
               </div>
 
               <AspectRatio ratio={16 / 9}>
@@ -154,17 +155,7 @@ const Detail = () => {
                 <h3 className="text-xl font-bold">Comment ({dataComments?.length})</h3>
 
                 {!isuser && (
-                  <div className="flex gap-1 items-center">
-                    Please
-                    <Button variant={'link'} asChild className="font-bold underline p-0">
-                      <a href={`/login?redirect=post/${id}`}>Login</a>
-                    </Button>
-                    or
-                    <Button variant={'link'} asChild className="font-bold underline p-0">
-                      <a href={`/register?redirect=post/${id}`}>Register</a>
-                    </Button>
-                    to write a comment
-                  </div>
+                  <LoginBeforeComment pathname={pathname} />
                 )}
 
                 {isuser && (
@@ -244,26 +235,35 @@ const Detail = () => {
                             </DialogTitle>
                           </DialogHeader>
 
-                          <div className="px-6 py-4 flex flex-col gap-3 border-b bg-white z-10 flex-none">
-                            <span className="font-semibold text-sm">Give your Comments</span>
-                            <Field data-invalid={!commentValid}>
-                              <Textarea
-                                value={comment}
-                                onChange={(e) => handleComment(e.target.value)}
-                                aria-invalid={!commentValid}
-                                placeholder="Enter your comment"
-                                className="h-35 w-full rounded-xl px-4 py-2" />
-                              {!commentValid && (<FieldLabel className="text-xs colorerrormsg" htmlFor="input-invalid">Comment required</FieldLabel>)}
-                            </Field>
-                            <Button
-                              disabled={isPending}
-                              onClick={sendComment}
-                              className="rounded-full w-full max-w-[180px] h-11 self-end"
-                            >
-                              {isPending && <Spinner className="mr-2" />}
-                              Send
-                            </Button>
-                          </div>
+                          {!isuser && (
+                            <div className="px-6 py-4 flex flex-col gap-3 border-b bg-white z-10 flex-none">
+                              <LoginBeforeComment pathname={pathname} />
+                            </div>
+                          )}
+
+                          {isuser && (
+                            <div className="px-6 py-4 flex flex-col gap-3 border-b bg-white z-10 flex-none">
+                              <span className="font-semibold text-sm">Give your Comments</span>
+                              <Field data-invalid={!commentValid}>
+                                <Textarea
+                                  value={comment}
+                                  onChange={(e) => handleComment(e.target.value)}
+                                  aria-invalid={!commentValid}
+                                  placeholder="Enter your comment"
+                                  className="h-35 w-full rounded-xl px-4 py-2" />
+                                {!commentValid && (<FieldLabel className="text-xs colorerrormsg" htmlFor="input-invalid">Comment required</FieldLabel>)}
+                              </Field>
+                              <Button
+                                disabled={isPending}
+                                onClick={sendComment}
+                                className="rounded-full w-full max-w-[180px] h-11 self-end"
+                              >
+                                {isPending && <Spinner className="mr-2" />}
+                                Send
+                              </Button>
+                            </div>
+                          )}
+
 
                           <div
                             id="commentInDialog"
@@ -340,3 +340,20 @@ const Detail = () => {
 }
 
 export default Detail;
+
+const LoginBeforeComment = ({ pathname }: { pathname: string }) => {
+  return (
+    <div className="flex gap-1 items-center">
+      Please
+      <Button variant={'link'} asChild className="font-bold underline p-0">
+        <a href={`/login${pathname ? `?redirect=${pathname}` : ``}`}>Login</a>
+      </Button>
+      or
+      <Button variant={'link'} asChild className="font-bold underline p-0">
+        <a href={`/register${pathname ? `?redirect=${pathname}` : ``}`}>Register</a>
+      </Button>
+      to write a comment
+    </div>
+  )
+}
+
