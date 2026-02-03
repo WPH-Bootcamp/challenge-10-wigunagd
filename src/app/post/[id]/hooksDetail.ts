@@ -1,7 +1,7 @@
-import { BlogPost, CommentListResponse } from "@/types/blog";
-import { useQuery } from "@tanstack/react-query"
+import { BlogPost, CommentListResponse, CommentSendBody, CommentSendResponse } from "@/types/blog";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { AxiosError } from "axios";
-import { getPostDetail, getPostDetailComment } from "./apiDetail";
+import { doComment, getPostDetail, getPostDetailComment } from "./apiDetail";
 
 export const useGetPostDetail = (params: BlogPost) => {
     return useQuery<BlogPost, AxiosError>({
@@ -10,12 +10,22 @@ export const useGetPostDetail = (params: BlogPost) => {
     });
 }
 
-export const useGetPostDetailComment = (id: string | number) => {
+export const useGetPostDetailComment = (id: number) => {
     return useQuery<CommentListResponse, AxiosError>({
-        queryKey: ['post-comments', id],
+        queryKey: ['post-comments'],
         queryFn: () => getPostDetailComment(id),
         enabled: !!id,
         refetchOnWindowFocus: false,
         staleTime: 1000 * 60 * 10
     });
 };
+
+export const useDoComment = () => {
+    const queryClient = useQueryClient();
+    return useMutation<CommentSendResponse, AxiosError, CommentSendBody>({
+        mutationFn: (body) => doComment(body),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['post-comments'] });
+        }
+    })
+}

@@ -1,6 +1,6 @@
 'use client'
 
-import { logo, iconMenu, iconMenuClose, iconSearch, iconLogOut, iconUser, iconWritePost } from "../../public/asset/asset";
+import { logo, iconMenu, iconMenuClose, iconSearch, iconLogOut, iconUser, iconWritePost, tmpProfilePicture } from "../../public/asset/asset";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
@@ -12,18 +12,12 @@ import { useAppDispatch, useAppSelector } from "@/redux/3_redux";
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuGroup,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuPortal,
-    DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
-    DropdownMenuTrigger,
+    DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { logout } from "@/redux/1_authSlice";
+import { useGetMe } from "@/app/(getme)/hooksGetMe";
+import { setMeData } from "@/redux/1_meSlice";
 
 
 const MotionButton = motion.create(Button);
@@ -31,7 +25,14 @@ const MotionButton = motion.create(Button);
 const Navigation = () => {
     const authState = useAppSelector((state) => state.auth);
     const isuser = (authState.accessToken !== "" && authState.isLoggedin);
+    const { data: dataMe } = useGetMe({ enabled: isuser });
     const dispatch = useAppDispatch();
+
+    useEffect(() =>{
+        if(dataMe){
+            dispatch(setMeData(dataMe))
+        }
+    }, [dataMe, dispatch]);
 
     const [isMounted, setIsMounted] = useState(false);
     const [desktopMode, setDesktopMode] = useState(false);
@@ -178,7 +179,7 @@ const Navigation = () => {
 
                     {/* saat sudah login */}
                     {isuser && (
-                        <div className="flex items-center h-full gap-2 px-2 order-2">
+                        <div className="flex items-center h-full gap-2 pl-2 order-2">
 
                             <Button variant='link' asChild className="font-semibold underline h-auto py-0 md:flex hidden">
                                 <Link href="/write" className="flex items-center gap-2">
@@ -189,11 +190,11 @@ const Navigation = () => {
 
                             <DropdownMenu key={`dropdownMenuProfile`}>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant={'ghost'} className="h-auto py-1 flex items-center gap-2">
+                                    <Button variant={'ghost'} className="h-auto py-1 flex items-center gap-3">
                                         <div className="flex items-center justify-center w-10 h-10 border rounded-full overflow-hidden">
-                                            <Image src={iconUser} width={24} height={24} alt="profile" />
+                                            <Image src={dataMe?.avatarUrl ?? tmpProfilePicture} alt="profile" />
                                         </div>
-                                        <span className="hidden md:inline">Me</span>
+                                        <span className="hidden md:inline">{dataMe?.name}</span>
                                     </Button>
                                 </DropdownMenuTrigger>
 

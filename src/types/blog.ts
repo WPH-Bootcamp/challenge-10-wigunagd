@@ -7,7 +7,7 @@
 
 // blog
 export interface Author {
-    id: string;
+    id: number;
     name: string;
     email: string;
     headline: string;
@@ -15,7 +15,7 @@ export interface Author {
 }
 
 export interface BlogPost {
-    id: string;
+    id: number;
     title?: string;
     content?: string;
     tags?: string[];
@@ -37,7 +37,7 @@ export interface BlogResponse {
 
 // comment
 export interface Author {
-    id: string;
+    id: number;
     name: string;
     username: string;
     headline: string;
@@ -52,3 +52,27 @@ export interface Comment {
 }
 
 export type CommentListResponse = Comment[];
+
+// send comment
+export interface CommentSendBody {
+    postId: number;
+    content: string;
+}
+
+export interface CommentAuthor {
+  id: number;
+  name: string;
+  email: string;
+}
+
+export interface CommentPost {
+  id: number;
+}
+
+export interface CommentSendResponse {
+  id: number;
+  content: string;
+  author: CommentAuthor;
+  post: CommentPost;
+  createdAt: string;
+}
