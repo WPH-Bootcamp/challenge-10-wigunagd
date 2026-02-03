@@ -16,7 +16,7 @@ const HomePageContent = () => {
         data: dataRecommendation,
         isLoading: isLoadingRecommendation,
         isFetching: isFetchingRecommendation
-    } = useGetRecommendations({ page: pageQuery, limit: 3 });
+    } = useGetRecommendations({ page: pageQuery, limit: 10 });
 
     const {
         data: dataMostLiked,

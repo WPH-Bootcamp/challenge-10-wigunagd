@@ -203,3 +203,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+.colorerrormsg{
+  color: #EE1D52;
+}

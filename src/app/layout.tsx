@@ -1,13 +1,19 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Providers from "@/components/Providers";
+import QueryClientProvidersWrap from "@/components/QueryClientProvidersWrap";
+import { Toaster } from "@/components/ui/sonner"
+import ReduxProviderWrap from "@/components/ReduxProviderWrap";
 
 const inter = Inter({
   subsets: ['latin'],
-  display: 'swap', 
+  display: 'swap',
 });
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+}
 
 export const metadata: Metadata = {
   title: "Blog App Challenge - Gede Wiguna - WPH 034",
@@ -24,9 +30,13 @@ export default function RootLayout({
       <body
         className={inter.className}
       >
-        <Providers>
-          {children}
-        </Providers>
+        <ReduxProviderWrap>
+          <QueryClientProvidersWrap>
+            {children}
+            <Toaster />
+          </QueryClientProvidersWrap>
+        </ReduxProviderWrap>
+
       </body>
     </html>
   );

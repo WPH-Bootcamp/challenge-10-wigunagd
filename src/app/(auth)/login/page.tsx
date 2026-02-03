@@ -11,20 +11,32 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { iconEye, iconEyeOff } from "../../../../public/asset/asset";
 import { useSearchParams } from "next/navigation";
 import { Field, FieldLabel } from "@/components/ui/field";
+import { useDoLogin } from "./hooksLogin";
+import { Spinner } from "@/components/ui/spinner";
+import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/redux/3_redux";
+import { toast } from "sonner";
 
 const Login = () => {
     const searchParams = useSearchParams();
     const redirectPath = searchParams.get('redirect');
+    const destination = redirectPath
+        ? `/${redirectPath}`
+        : '/';
 
     const [email, setEmail] = useState("");
     const [emailValid, setEmailValid] = useState(true);
     const [passwd, setPasswd] = useState("");
     const [passwdValid, setPasswdValid] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
+
+    const router = useRouter();
+    const authState = useAppSelector((state) => state.auth);
+    const { mutate, isPending } = useDoLogin();
 
     const handleEmail = (text: string) => {
         setEmail(text);
@@ -36,38 +48,65 @@ const Login = () => {
         setPasswdValid(text.length > 0);
     }
 
-
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
 
+    const onLogin = () => {
+        const isEmailValid = email.length > 0;
+        const isPasswdValid = passwd.length > 0;
+
+        setEmailValid(isEmailValid);
+        setPasswdValid(isPasswdValid);
+
+        if (isEmailValid && isPasswdValid) {
+            mutate({
+                email: email,
+                password: passwd
+            }, {
+                onSuccess: () => {
+                    router.push(destination);
+                },
+                onError: () => {
+                    toast.error('Login gagal, periksa kembali email dan password');
+                }
+            })
+        }
+    }
+
+    useEffect(() => {
+        if (authState.accessToken !== "" && authState.isLoggedin) {
+            router.push(destination);
+        }
+    }, [authState.accessToken, authState.isLoggedin, destination, router]);
+
     return (
         <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 px-4">
-            <Card className="w-full max-w-[360px] shadow-lg gap-5">
+            <Card className="w-full max-w-90 shadow-lg gap-5">
                 <CardHeader>
-                    <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
+                    <CardTitle className="text-xl font-bold">Sign In</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-5">
                     <div className="grid gap-4">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email" className="text-sm">Email</Label>
                         <Field data-invalid={!emailValid}>
                             <Input
                                 id="email"
                                 type="email"
                                 placeholder="Enter your email"
-                                className="pr-10  h-[48px] rounded-xl"
+                                className="pr-10 h-12 rounded-xl text-sm"
                                 required
                                 onChange={(e) => handleEmail(e.target.value)}
                                 value={email}
                                 aria-invalid={!emailValid}
                             />
-                            {!emailValid && (<FieldLabel className="text-xs text-red-700" htmlFor="input-invalid">Email required</FieldLabel>)}
+                            {!emailValid && (<FieldLabel className="text-xs colorerrormsg" htmlFor="input-invalid">Email required</FieldLabel>)}
                         </Field>
                     </div>
 
                     <div className="grid gap-4">
                         <div className="flex items-center justify-between">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password" className="text-sm">Password</Label>
                         </div>
                         <Field data-invalid={!passwdValid}>
                             <div className="relative">
@@ -75,7 +114,7 @@ const Login = () => {
                                     id="password"
                                     type={showPassword ? "text" : "password"}
                                     placeholder="Enter your password"
-                                    className="pr-10  h-[48px] rounded-xl"
+                                    className="pr-10 h-12 rounded-xl text-sm"
                                     required
                                     onChange={(e) => handlePassword(e.target.value)}
                                     value={passwd}
@@ -95,12 +134,15 @@ const Login = () => {
                                     />
                                 </button>
                             </div>
-                            {!passwdValid && (<FieldLabel className="text-xs text-red-700" htmlFor="input-invalid">Password required</FieldLabel>)}
+                            {!passwdValid && (<FieldLabel className="text-xs colorerrormsg" htmlFor="input-invalid">Password required</FieldLabel>)}
                         </Field>
                     </div>
 
                     <div className="grid gap-4">
-                        <Button className="w-full rounded-full h-[48px]">Sign In</Button>
+                        <Button
+                            disabled={isPending}
+                            onClick={onLogin}
+                            className="w-full rounded-full h-12 text-sm">{isPending && (<Spinner />)} Sign In</Button>
                         <div className="text-sm text-center text-muted-foreground">
                             Don`t have an account?{" "}
                             <Link

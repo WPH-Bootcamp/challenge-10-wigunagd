@@ -1,6 +1,6 @@
 'use client'
 
-import { logo, iconMenu, iconMenuClose, iconSearch } from "../../public/asset/asset";
+import { logo, iconMenu, iconMenuClose, iconSearch, iconLogOut, iconUser, iconWritePost } from "../../public/asset/asset";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
@@ -8,10 +8,31 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useGetSearch } from "@/app/(SearchQuery)/hooksSearchQuery";
 import SearchResultView from "./SearchResultView";
 import Link from "next/link";
+import { useAppDispatch, useAppSelector } from "@/redux/3_redux";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuPortal,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { logout } from "@/redux/1_authSlice";
+
 
 const MotionButton = motion.create(Button);
 
 const Navigation = () => {
+    const authState = useAppSelector((state) => state.auth);
+    const isuser = (authState.accessToken !== "" && authState.isLoggedin);
+    const dispatch = useAppDispatch();
+
     const [isMounted, setIsMounted] = useState(false);
     const [desktopMode, setDesktopMode] = useState(false);
     const [isOpenMenu, setIsOpenMenu] = useState(false);
@@ -122,78 +143,128 @@ const Navigation = () => {
                     </div>
                 </div>
 
-                <AnimatePresence>
-                    {isMounted && (isOpenMenu || desktopMode) && (
-                        <motion.div
-                            id="buttonlogingroup"
-                            className={`
+                <div className="flex items-center md:gap-4">
+
+                    {/* saat belum login */}
+                    {!isuser && (
+                        <AnimatePresence>
+                            {isMounted && (isOpenMenu || desktopMode) && (
+                                <motion.div
+                                    id="buttonlogingroup"
+                                    className={`
                                 md:flex-row md:relative md:top-0 md:h-auto md:w-auto md:p-0 ms:max-w-[266px] gap-6 items-center bg-white
                                 flex flex-col absolute top-[80px] left-0 w-full h-screen pt-10 px-5
                                 z-40
                             `}
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.2 }}
-                        >
-                            <Button variant='link' asChild className="font-semibold underline">
-                                <a href="/login" onClick={() => setIsOpenMenu(false)}>Login</a>
-                            </Button>
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <Button variant='link' asChild className="font-semibold underline">
+                                        <a href="/login" onClick={() => setIsOpenMenu(false)}>Login</a>
+                                    </Button>
 
-                            <div className="hidden md:block border-l-2 h-full border-gray-200"></div>
+                                    <div className="hidden md:block border-l-2 h-full border-gray-200"></div>
 
-                            <Button asChild className="rounded-full w-full max-w-[214px] md:w-[182px] h-[44px]">
-                                <a href="/register" onClick={() => setIsOpenMenu(false)}>Register</a>
-                            </Button>
-                        </motion.div>
+                                    <Button asChild className="rounded-full w-full max-w-[214px] md:w-[182px] h-[44px]">
+                                        <a href="/register" onClick={() => setIsOpenMenu(false)}>Register</a>
+                                    </Button>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     )}
-                </AnimatePresence>
+                    {/* saat belum login */}
 
-                <div className="md:hidden flex gap-3 items-center">
-                    <AnimatePresence>
-                        {isMounted && (!isOpenMenu && !isOpenSearch) && (
-                            <MotionButton
-                                key="buttonopensearch"
-                                id="buttonopensearch"
-                                variant='ghost'
-                                onClick={handleOpenSearch}
-                                whileTap={{ scale: 0.9 }}
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                transition={{
-                                    duration: 0.1,
-                                    ease: 'easeOut'
-                                }}
-                            >
-                                <Image src={iconSearch} alt="Icon Search" width={24} height={24} />
-                            </MotionButton>
-                        )}
-                    </AnimatePresence>
+                    {/* saat sudah login */}
+                    {isuser && (
+                        <div className="flex items-center h-full gap-2 px-2 order-2">
 
-                    <AnimatePresence mode="wait">
-                        {isMounted && (
-                            <MotionButton
-                                key={isOpenMenu ? "close" : "open"}
-                                onClick={handleOpenMenu}
-                                variant="ghost"
-                                size="icon"
-                                whileTap={{ scale: 0.9 }}
-                                initial={{ opacity: 0, rotate: 45 }}
-                                animate={{ opacity: 1, rotate: 0 }}
-                                exit={{ opacity: 0, rotate: -45 }}
-                            >
-                                <Image
-                                    src={isOpenMenu ? iconMenuClose : iconMenu}
-                                    alt="Menu"
-                                    width={24}
-                                    height={24}
-                                />
-                            </MotionButton>
+                            <Button variant='link' asChild className="font-semibold underline h-auto py-0 md:flex hidden">
+                                <Link href="/write" className="flex items-center gap-2">
+                                    <Image src={iconWritePost} width={24} height={24} alt="Write Post" />
+                                    <span className="whitespace-nowrap">Write Post</span>
+                                </Link>
+                            </Button>
+
+                            <DropdownMenu key={`dropdownMenuProfile`}>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant={'ghost'} className="h-auto py-1 flex items-center gap-2">
+                                        <div className="flex items-center justify-center w-10 h-10 border rounded-full overflow-hidden">
+                                            <Image src={iconUser} width={24} height={24} alt="profile" />
+                                        </div>
+                                        <span className="hidden md:inline">Me</span>
+                                    </Button>
+                                </DropdownMenuTrigger>
+
+                                <DropdownMenuContent className="w-[182px] mt-1 rounded-lg grid gap-4 p-2" align="end">
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/profile" className="flex gap-2 cursor-pointer">
+                                            <Image src={iconUser} width={20} height={20} alt="profile" />Profile
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => dispatch(logout())} className="cursor-pointer">
+                                        <div className="flex gap-2">
+                                            <Image src={iconLogOut} width={20} height={20} alt="logout" />Logout
+                                        </div>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    )}
+                    {/* saat sudah login */}
+
+                    <div className="md:hidden flex gap-3 items-center order-1">
+                        <AnimatePresence>
+                            {isMounted && (!isOpenMenu && !isOpenSearch) && (
+                                <MotionButton
+                                    key="buttonopensearch"
+                                    id="buttonopensearch"
+                                    variant='ghost'
+                                    onClick={handleOpenSearch}
+                                    whileTap={{ scale: 0.9 }}
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{
+                                        duration: 0.1,
+                                        ease: 'easeOut'
+                                    }}
+                                >
+                                    <Image src={iconSearch} alt="Icon Search" width={24} height={24} />
+                                </MotionButton>
+                            )}
+                        </AnimatePresence>
+
+                        {/* saat belum login */}
+                        {!isuser && (
+                            <AnimatePresence mode="wait">
+                                {isMounted && (
+                                    <MotionButton
+                                        key={isOpenMenu ? "close" : "open"}
+                                        onClick={handleOpenMenu}
+                                        variant="ghost"
+                                        size="icon"
+                                        whileTap={{ scale: 0.9 }}
+                                        initial={{ opacity: 0, rotate: 45 }}
+                                        animate={{ opacity: 1, rotate: 0 }}
+                                        exit={{ opacity: 0, rotate: -45 }}
+                                    >
+                                        <Image
+                                            src={isOpenMenu ? iconMenuClose : iconMenu}
+                                            alt="Menu"
+                                            width={24}
+                                            height={24}
+                                        />
+                                    </MotionButton>
+                                )}
+                            </AnimatePresence>
                         )}
-                    </AnimatePresence>
-                    
+                        {/* saat belum login */}
+
+                    </div>
                 </div>
+
             </nav>
         </header>
     );
