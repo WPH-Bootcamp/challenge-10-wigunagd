@@ -10,11 +10,12 @@ import { Button } from "./ui/button";
 
 type BlogCardActionProps = {
     action?: boolean;
-    onStatisticClick?: (id: number, openDialog: boolean) => void;
+    onStatistikClick?: (id: number, openDialog: boolean) => void;
+    onDeleteClick?: (id: number, openDialog: boolean) => void;
 }
 type BlogCardProps = BlogPost & BlogCardActionProps;
 
-const BlogCard = ({ id, title, content, tags, imageUrl, author, createdAt, likes, comments, action, onStatisticClick }: BlogCardProps) => {
+const BlogCard = ({ id, title, content, tags, imageUrl, author, createdAt, likes, comments, action, onStatistikClick, onDeleteClick }: BlogCardProps) => {
 
     const { data: dataAuthor } = useGetPostAuthorDetail(Number(author?.id));
 
@@ -86,14 +87,16 @@ const BlogCard = ({ id, title, content, tags, imageUrl, author, createdAt, likes
                 {action && (
                     <div className="flex flex-row items-center gap-3">
                         <Button 
-                        onClick={() => id && onStatisticClick?.(id, true)}
+                        onClick={() => id && onStatistikClick?.(id, true)}
                         variant={'link'} className="underline px-0">
                             Statistic
                         </Button>
                         <Button variant={'link'} asChild className="underline border-l border-r rounded-none">
                             <a href={`/edit/${id}`}>Edit</a>
                         </Button>
-                        <Button variant={'link'} className="underline px-0 text-destructive">
+                        <Button 
+                        onClick={() => id && onDeleteClick?.(id, true)}
+                        variant={'link'} className="underline px-0 text-destructive">
                             Delete
                         </Button>
                     </div>

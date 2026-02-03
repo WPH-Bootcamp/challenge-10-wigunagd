@@ -6,20 +6,20 @@ import { useGetMe } from "../(getme)/hooksGetMe";
 import { useAppSelector } from "@/redux/3_redux";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { iconComment, iconLike, iconPageNext, iconPagePrevious, tmpProfilePicture } from "../../../public/asset/asset";
+import { iconPageNext, iconPagePrevious, tmpProfilePicture } from "../../../public/asset/asset";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useGetMyPosts } from "./hooksMyProfile";
+import { useGetComments, useGetLikes, useGetMyPosts } from "./hooksMyProfile";
 import { BlogCardSkeleton } from "@/components/BlogCardSkeleton";
 import BlogCard from "@/components/BlogCard";
 import {
     Dialog,
     DialogContent,
+    DialogFooter,
     DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+    DialogTitle
 } from "@/components/ui/dialog"
 import { BiLike } from "react-icons/bi";
 import { VscComment } from "react-icons/vsc";
@@ -39,8 +39,10 @@ const Profile = () => {
         }
     }, [authState.accessToken, authState.isLoggedin, router]);
 
-    const [isDialogCommentOpen, setIsDialogCommentOpen] = useState(false);
+    const [isDialogStatisticOpen, setIsDialogStatisticOpen] = useState(false);
     const [idStatistic, setIdStatistic] = useState(0);
+    const [isDialogDeleteOpen, setIsDialogDeleteOpen] = useState(false);
+    const [idDelete, setIdDelete] = useState(0);
     const [pageQuery, setPageQuery] = useState(1);
     const {
         data: dataRecommendation,
@@ -48,6 +50,9 @@ const Profile = () => {
         isFetching: isFetchingRecommendation
     } = useGetMyPosts({ page: pageQuery, limit: 10 });
     const maxPageRecommendation = dataRecommendation?.lastPage ?? 1;
+
+    const { data: dataLikes } = useGetLikes(idStatistic);
+    const { data: dataComments } = useGetComments(idStatistic);
 
     const handlePageNextPrev = (i: number) => {
         let valPageQuery = pageQuery + i;
@@ -69,9 +74,14 @@ const Profile = () => {
         }
     }
 
-    const onStatisticClick = ({ id, openDialogStatisticParam }: { id: number, openDialogStatisticParam: boolean }) => {
+    const onStatistikClick = ({ id, openDialogStatisticParam }: { id: number, openDialogStatisticParam: boolean }) => {
         setIdStatistic(id);
-        setIsDialogCommentOpen(openDialogStatisticParam);
+        setIsDialogStatisticOpen(openDialogStatisticParam);
+    }
+
+    const onDeleteClick = ({ id, openDialogDeleteParam }: { id: number, openDialogDeleteParam: boolean }) => {
+        setIdDelete(id);
+        setIsDialogDeleteOpen(openDialogDeleteParam);
     }
 
     return (
@@ -106,8 +116,8 @@ const Profile = () => {
                                         variant="tabs"
                                         className=" 
                                         rounded-none
-                                        h-[44px]
-                                        w-[177px]
+                                        h-11
+                                        w-44.25
                                         data-[state=active]:shadow-none 
                                         data-[state=active]:border-b-3 
                                         data-[state=active]:border-b-primary 
@@ -122,8 +132,8 @@ const Profile = () => {
                                         variant="tabs"
                                         className=" 
                                         rounded-none
-                                        h-[44px]
-                                        w-[177px]
+                                        h-11
+                                        w-44.25
                                         data-[state=active]:shadow-none 
                                         data-[state=active]:border-b-3 
                                         data-[state=active]:border-b-primary 
@@ -156,7 +166,8 @@ const Profile = () => {
                                                     likes={post.likes}
                                                     comments={post.comments}
                                                     action
-                                                    onStatisticClick={(id) => onStatisticClick({ id, openDialogStatisticParam: true })}
+                                                    onStatistikClick={(id: number) => onStatistikClick({ id, openDialogStatisticParam: true })}
+                                                    onDeleteClick={(id: number) => onDeleteClick({ id, openDialogDeleteParam: true })}
                                                 />
                                             ))
                                         )
@@ -206,13 +217,9 @@ const Profile = () => {
                     </div>
                 )}
 
-                <Dialog open={isDialogCommentOpen} onOpenChange={() => setIsDialogCommentOpen(!isDialogCommentOpen)}>
-                    <DialogTrigger asChild>
-                        <Button variant="link" className="font-bold underline p-0">
-                            See All Comments
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="md:max-w-[613px] md:max-h-[902px] h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
+                <Dialog open={isDialogStatisticOpen} onOpenChange={() => setIsDialogStatisticOpen(!isDialogStatisticOpen)}>
+
+                    <DialogContent className="md:max-w-153.25 md:max-h-225.5 min-h-[50vh] flex flex-col p-0 gap-0 overflow-hidden">
                         <DialogHeader className="p-6 pb-2 flex-none">
                             <DialogTitle className="text-xl font-bold">
                                 Statistic
@@ -225,8 +232,8 @@ const Profile = () => {
                                         variant="tabs"
                                         className=" 
                                         rounded-none
-                                        h-[44px]
-                                        w-[177px]
+                                        h-11
+                                        w-44.25
                                         data-[state=active]:shadow-none 
                                         data-[state=active]:border-b-3 
                                         data-[state=active]:border-b-primary 
@@ -242,8 +249,8 @@ const Profile = () => {
                                         variant="tabs"
                                         className=" 
                                         rounded-none
-                                        h-[44px]
-                                        w-[177px]
+                                        h-11
+                                        w-44.25
                                         data-[state=active]:shadow-none 
                                         data-[state=active]:border-b-3 
                                         data-[state=active]:border-b-primary 
@@ -257,16 +264,59 @@ const Profile = () => {
 
                             </TabsList>
 
-                            <TabsContent value="liketab" className="mt-6">
-                                Like Here
+                            <TabsContent value="liketab" className="mt-6 flex flex-col gap-2">
+                                <span className="text-lg font-bold">Like ({dataLikes?.length ?? 0})</span>
+                                <div className="flex flex-col gap-2">
+                                    {
+                                        dataLikes?.map((likes, i) => (
+                                            <div key={i} className={`flex flex-row py-3 gap-3 ${i < (dataLikes.length - 1) ? 'border-b' : ''}`}>
+                                                <Image src={likes.avatarUrl ?? tmpProfilePicture} alt={likes.name} width={48} height={48} className="w-12 h-12 rounded-full" />
+                                                <div className="flex flex-col gap-1">
+                                                    <span className="text-sm font-semibold">{likes.name}</span>
+                                                    <span className="text-sm">{likes.headline}</span>
+                                                </div>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
                             </TabsContent>
 
-                            <TabsContent value="commenttab" className="mt-6">
-                                Comment Here
+                            <TabsContent value="commenttab" className="mt-6 flex flex-col gap-2">
+                                <span className="text-lg font-bold">Comment ({dataComments?.length ?? 0})</span>
+                                <div className="flex flex-col gap-2">
+                                    {
+                                        dataComments?.map((comment, i) => (
+                                            <div key={i} className={`flex flex-row py-3 gap-3 ${i < (dataComments.length - 1) ? 'border-b' : ''}`}>
+                                                <Image src={comment.author.avatarUrl ?? tmpProfilePicture} alt={comment.author.name} width={48} height={48} className="w-12 h-12 rounded-full" />
+                                                <div className="flex flex-col gap-1">
+                                                    <span className="text-sm font-semibold">{comment.author.name}</span>
+                                                    <span className="text-sm">{comment.author.headline}</span>
+                                                </div>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
                             </TabsContent>
                         </Tabs>
                     </DialogContent>
                 </Dialog>
+
+                <Dialog open={isDialogDeleteOpen} onOpenChange={() => setIsDialogDeleteOpen(!isDialogDeleteOpen)}>
+
+                    <DialogContent className="md:max-w-134.25 flex flex-col gap-4 overflow-hidden rounded-3xl p-3">
+                        <DialogHeader className="p-6 pb-2 flex-none">
+                            <DialogTitle className="text-xl font-bold">
+                                Delete
+                            </DialogTitle>
+                        </DialogHeader>
+                        <p className="mx-6">Are you sure to delete?</p>
+                        <DialogFooter className="justify-end px-6">
+                            <Button variant={'ghost'} className="rounded-full text-sm w-full max-w-42.75 h-12">Cancel</Button>
+                            <Button className="rounded-full text-sm font-semibold bg-danger w-full max-w-42.75 h-12">Delete</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
             </main>
             <Footer />
         </div>

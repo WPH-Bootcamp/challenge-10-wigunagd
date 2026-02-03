@@ -10,3 +10,13 @@ export const getMyPosts = async ({ limit, page }: BlogResponse) => {
     });
     return response.data;
 }
+
+export const getLikes = async (id: number) => {
+    const response = await apiAxios.get(`/posts/${id}/likes`);
+    return response.data;
+}
+
+export const getComments = async (id: number) => {
+    const response = await apiAxios.get(`/posts/${id}/comments`);
+    return response.data;
+}
