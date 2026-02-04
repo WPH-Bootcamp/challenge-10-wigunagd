@@ -9,3 +9,13 @@ export interface UpdateProfileRequestBody {
   headline: string;
   avatar: File | null;
 }
+
+export interface UserProfile {
+  id: number;
+  name: string;
+  email: string;
+  username: string;
+  headline: string;
+  avatarUrl: string;
+  avatarPublicId: string;
+}

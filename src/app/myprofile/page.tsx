@@ -311,7 +311,7 @@ const Profile = () => {
                                             </div>
                                             <div className="flex flex-col">
                                                 <span className="text-lg font-bold">{dataMe?.name}</span>
-                                                <span className="text-md">{dataMe?.headline ?? 'Fronted Developer'}</span>
+                                                <span className="text-md">{dataMe?.headline ?? '-'}</span>
                                             </div>
                                         </div>
                                         <div className="flex flex-row gap-2 items-center justify-end w-1/4">
