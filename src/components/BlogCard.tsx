@@ -46,8 +46,10 @@ const BlogCard = ({ id, title, content, tags, imageUrl, author, createdAt, likes
 
                 {!action && (
                     <div className="flex flex-row items-center gap-2 text-sm">
-                        <Image src={dataAuthor?.avatarUrl ?? tmpProfilePicture} width={40} height={40} alt="Profile-Img" className="rounded-full w-10 h-10" />
-                        <b>{author?.name ?? '...'}</b> &middot; {createdAt && (<span>{formattedDate(createdAt, 'DD MMMM YYYY')}</span>)}
+                        <a href={`/profile/${author?.id}`} className="flex flex-row items-center gap-2 text-sm">
+                            <Image src={dataAuthor?.avatarUrl ?? tmpProfilePicture} width={40} height={40} alt="Profile-Img" className="rounded-full w-10 h-10" />
+                            <b>{author?.name ?? '...'}</b> &middot; {createdAt && (<span>{formattedDate(createdAt, 'DD MMMM YYYY')}</span>)}
+                        </a>
                     </div>
                 )}
 
@@ -86,17 +88,17 @@ const BlogCard = ({ id, title, content, tags, imageUrl, author, createdAt, likes
 
                 {action && (
                     <div className="flex flex-row items-center gap-3">
-                        <Button 
-                        onClick={() => id && onStatistikClick?.(id, true)}
-                        variant={'link'} className="underline px-0">
+                        <Button
+                            onClick={() => id && onStatistikClick?.(id, true)}
+                            variant={'link'} className="underline px-0">
                             Statistic
                         </Button>
                         <Button variant={'link'} asChild className="underline border-l border-r rounded-none">
                             <a href={`/edit/${id}`}>Edit</a>
                         </Button>
-                        <Button 
-                        onClick={() => id && onDeleteClick?.(id, true)}
-                        variant={'link'} className="underline px-0 text-destructive">
+                        <Button
+                            onClick={() => id && onDeleteClick?.(id, true)}
+                            variant={'link'} className="underline px-0 text-destructive">
                             Delete
                         </Button>
                     </div>

@@ -6,7 +6,7 @@ import { useGetMe } from "../(getme)/hooksGetMe";
 import { useAppSelector } from "@/redux/3_redux";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { iconAddPicture, iconEye, iconEyeOff, iconPageNext, iconPagePrevious, tmpProfilePicture } from "../../../public/asset/asset";
+import { iconAddPicture, iconBlankDocument, iconEye, iconEyeOff, iconPageNext, iconPagePrevious, iconWritePost, iconWritePostWhite, tmpProfilePicture } from "../../../public/asset/asset";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,9 @@ import { ApiErrorResponse } from "@/types/apiresponse";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel } from "@/components/ui/field";
+import Link from "next/link";
+import ButtonWriteNewPost from "./CommonComponentMyProfile";
+import ProfileSkeleton from "@/components/ProfileSkeleton";
 
 
 
@@ -37,7 +40,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 const Profile = () => {
     const authState = useAppSelector((state) => state.auth);
     const isuser = (authState.accessToken !== "" && authState.isLoggedin);
-    const { data: dataMe } = useGetMe({ enabled: isuser });
+    const { data: dataMe, isLoading: isLoadingDataMe } = useGetMe({ enabled: isuser });
     const router = useRouter();
 
     useEffect(() => {
@@ -53,11 +56,11 @@ const Profile = () => {
     const [idDelete, setIdDelete] = useState(0);
     const [pageQuery, setPageQuery] = useState(1);
     const {
-        data: dataRecommendation,
-        isLoading: isLoadingRecommendation,
-        isFetching: isFetchingRecommendation
+        data: dataPosts,
+        isLoading: isLoadingPosts,
+        isFetching: isFetchingPosts
     } = useGetMyPosts({ page: pageQuery, limit: 10 });
-    const maxPageRecommendation = dataRecommendation?.lastPage ?? 1;
+    const maxPagePosts = dataPosts?.lastPage ?? 1;
 
     const { data: dataLikes } = useGetLikes(idStatistic);
     const { data: dataComments } = useGetComments(idStatistic);
@@ -71,8 +74,8 @@ const Profile = () => {
             valPageQuery = 1;
         }
 
-        if (valPageQuery > maxPageRecommendation) {
-            valPageQuery = maxPageRecommendation;
+        if (valPageQuery > maxPagePosts) {
+            valPageQuery = maxPagePosts;
         }
 
         setPageQuery(valPageQuery);
@@ -296,20 +299,28 @@ const Profile = () => {
                     <div className="flex flex-col w-full max-w-200 mx-auto my-5 px-5 md:px-0 gap-5">
                         <Card>
                             <CardContent className="flex flex-row items-center gap-3">
-                                <div className="flex flex-row gap-2 items-center w-3/4">
-                                    <div className="flex flex-col items-center justify-center w-20 h-20 border rounded-full overflow-hidden">
-                                        <Image src={dataMe?.avatarUrl ?? tmpProfilePicture} alt="profile" width={80} height={80} className="w-20 h-20" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-lg font-bold">{dataMe?.name}</span>
-                                        <span className="text-md">{dataMe?.headline ?? 'Fronted Developer'}</span>
-                                    </div>
-                                </div>
-                                <div className="flex flex-row gap-2 items-center justify-end w-1/4">
-                                    <Button onClick={() => handleDialogUpdateProfileOpen(true)} variant='link' className="font-semibold underline">
-                                        Edit Profile
-                                    </Button>
-                                </div>
+                                {isLoadingDataMe && (
+                                    <ProfileSkeleton />
+                                )}
+
+                                {!isLoadingDataMe && (
+                                    <>
+                                        <div className="flex flex-row gap-2 items-center w-3/4">
+                                            <div className="flex flex-col items-center justify-center w-20 h-20 border rounded-full overflow-hidden">
+                                                <Image src={dataMe?.avatarUrl ?? tmpProfilePicture} alt="profile" width={80} height={80} className="w-20 h-20" />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-lg font-bold">{dataMe?.name}</span>
+                                                <span className="text-md">{dataMe?.headline ?? 'Fronted Developer'}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-row gap-2 items-center justify-end w-1/4">
+                                            <Button onClick={() => handleDialogUpdateProfileOpen(true)} variant='link' className="font-semibold underline">
+                                                Edit Profile
+                                            </Button>
+                                        </div>
+                                    </>
+                                )}
                             </CardContent>
                         </Card>
 
@@ -351,37 +362,59 @@ const Profile = () => {
                             </TabsList>
 
                             <TabsContent value="yourpost" className="mt-6">
-                                <div className="w-full flex flex-col relative">
+                                {isLoadingPosts && (
+                                    <BlogCardSkeleton />
+                                )}
 
-                                    {
-                                        (isLoadingRecommendation || isFetchingRecommendation) ? (
-                                            <BlogCardSkeleton />
-                                        ) : (
-                                            dataRecommendation?.data?.map((post) => (
-                                                <BlogCard
-                                                    key={post.id}
-                                                    id={post.id}
-                                                    title={post.title}
-                                                    content={post.content}
-                                                    tags={post.tags}
-                                                    imageUrl={post.imageUrl}
-                                                    author={post.author}
-                                                    createdAt={post.createdAt}
-                                                    likes={post.likes}
-                                                    comments={post.comments}
-                                                    action
-                                                    onStatistikClick={(id: number) => onStatistikClick({ id, openDialogStatisticParam: true })}
-                                                    onDeleteClick={(id: number) => onDeleteClick({ id, openDialogDeleteParam: true })}
-                                                />
-                                            ))
-                                        )
-                                    }
-                                </div>
+                                {!isLoadingPosts && (dataPosts?.data?.length ?? 0) < 1 && (
+                                    <div className="w-full flex flex-col relative items-center text-center mt-[55.5px] md:px-0 px-16 gap-4">
+                                        <Image src={iconBlankDocument} width={118} height={135} alt="No Result" />
+                                        <b className="text-sm">Your writing journey starts here</b>
+                                        <p className="text-sm">No posts yet, but every great writer starts with the first one.</p>
+                                        <ButtonWriteNewPost
+                                            className="w-full max-w-[182] h-11"
+                                        />
+                                    </div>
+                                )}
 
-                                {(!isLoadingRecommendation && maxPageRecommendation > 1) && (
+                                {!isLoadingPosts && (dataPosts?.data?.length ?? 0) > 0 && (
+                                    <div className="w-full flex flex-col relative">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-xl font-bold">{dataPosts?.data?.length ?? 0} Post</span>
+                                            <ButtonWriteNewPost
+                                                className="w-full max-w-[182] h-11"
+                                            />
+                                        </div>
+                                        {
+                                            (isLoadingPosts || isFetchingPosts) ? (
+                                                <BlogCardSkeleton />
+                                            ) : (
+                                                dataPosts?.data?.map((post) => (
+                                                    <BlogCard
+                                                        key={post.id}
+                                                        id={post.id}
+                                                        title={post.title}
+                                                        content={post.content}
+                                                        tags={post.tags}
+                                                        imageUrl={post.imageUrl}
+                                                        author={post.author}
+                                                        createdAt={post.createdAt}
+                                                        likes={post.likes}
+                                                        comments={post.comments}
+                                                        action
+                                                        onStatistikClick={(id: number) => onStatistikClick({ id, openDialogStatisticParam: true })}
+                                                        onDeleteClick={(id: number) => onDeleteClick({ id, openDialogDeleteParam: true })}
+                                                    />
+                                                ))
+                                            )
+                                        }
+                                    </div>
+                                )}
+
+                                {(!isLoadingPosts && maxPagePosts > 1) && (
                                     <div id="pagination"
                                         className={`flex flex-row w-full justify-center items-center my-2 gap-2 
-                                        ${isFetchingRecommendation ? 'opacity-50 pointer-events-none' : ''}`}>
+                                        ${isFetchingPosts ? 'opacity-50 pointer-events-none' : ''}`}>
 
                                         <Button
                                             disabled={pageQuery === 1}
@@ -391,7 +424,7 @@ const Profile = () => {
                                         </Button>
 
                                         {
-                                            Array.from({ length: maxPageRecommendation }, (_, i) => {
+                                            Array.from({ length: maxPagePosts }, (_, i) => {
                                                 const p = i + 1;
                                                 return (
                                                     <Button
@@ -405,7 +438,7 @@ const Profile = () => {
                                         }
 
                                         <Button
-                                            disabled={pageQuery === maxPageRecommendation}
+                                            disabled={pageQuery === maxPagePosts}
                                             onClick={() => handlePageNextPrev(1)}
                                             variant={'ghost'} className="flex">
                                             Next <Image src={iconPageNext} alt="Icon Next Previous" />
@@ -653,9 +686,9 @@ const Profile = () => {
                                         onClick={handleImageClick}
                                         className="absolute -right-4 -bottom-5 cursor-pointer w-15 h-15"
                                         variant={'transparent'}>
-                                        <a href="#">
+                                        <Link href="#">
                                             <Image src={iconAddPicture} alt="add picture" width={24} height={24} />
-                                        </a>
+                                        </Link>
                                     </Button>
                                 </div>
                                 <div className="grid gap-4">
@@ -713,4 +746,3 @@ const Profile = () => {
 }
 
 export default Profile;
-
