@@ -1,7 +1,7 @@
 import { BlogPost, CommentListResponse, CommentSendBody, CommentSendResponse, UserProfileResponse } from "@/types/blog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { AxiosError } from "axios";
-import { doComment, getPostAuthorDetail, getPostDetail, getPostDetailComment } from "./apiDetail";
+import { doComment, doLike, getPostAuthorDetail, getPostDetail, getPostDetailComment } from "./apiDetail";
 
 export const useGetPostDetail = (params: BlogPost) => {
     return useQuery<BlogPost, AxiosError>({
@@ -33,6 +33,16 @@ export const useDoComment = () => {
         mutationFn: (body) => doComment(body),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['post-comments'] });
+        }
+    })
+}
+
+export const useDoLike = (id: number) => {
+    const queryClient = useQueryClient();
+    return useMutation<BlogPost, AxiosError>({
+        mutationFn: () => doLike(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['likeList', id] });
         }
     })
 }

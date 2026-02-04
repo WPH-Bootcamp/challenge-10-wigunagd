@@ -2,10 +2,10 @@
 
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { useDoComment, useGetPostAuthorDetail, useGetPostDetail, useGetPostDetailComment } from "./hooksDetail";
+import { useDoComment, useDoLike, useGetPostAuthorDetail, useGetPostDetail, useGetPostDetailComment } from "./hooksDetail";
 import { useParams, usePathname } from "next/navigation";
 import Image from "next/image";
-import { iconComment, iconLike, tmpBlogimg, tmpProfilePicture } from "../../../../public/asset/asset";
+import { iconComment, iconLike, iconLiked, tmpBlogimg, tmpProfilePicture } from "../../../../public/asset/asset";
 import { formattedDate } from "@/lib/formatDate";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ import PostDetailSkeleton from "@/components/PostDetailSkeleton";
 import PostCommentSkeleton from "@/components/PostCommentSkeleton";
 import { useAppSelector } from "@/redux/3_redux";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { Field, FieldLabel } from "@/components/ui/field";
 import {
@@ -26,6 +26,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { useGetLikes } from "@/app/myprofile/hooksMyProfile";
+import Link from "next/link";
 
 
 
@@ -41,11 +43,21 @@ const Detail = () => {
   const [comment, setComment] = useState('');
   const [commentValid, setCommentValid] = useState(true);
   const [isDialogCommentOpen, setIsDialogCommentOpen] = useState(false);
-  const { mutate, isPending } = useDoComment()
+  const { mutate, isPending } = useDoComment();
 
   const { data: dataPostDetail, isLoading: isLoadingPostDetail, isFetching: isFetchingPostDetail } = useGetPostDetail({ id: Number(id) });
   const { data: dataComments, isLoading: isLoadingComments, isFetching: isFetchingComments } = useGetPostDetailComment(Number(id));
   const { data: dataAuthor } = useGetPostAuthorDetail(Number(dataPostDetail?.author?.id));
+  const { data: dataLikes } = useGetLikes(Number(id));
+
+  const { mutate: mutateLike } = useDoLike(Number(id));
+
+  const { likedByMe, likeCount } = useMemo(() => {
+    const count = dataLikes?.length ?? 0;
+    const isLiked = dataLikes?.some(like => like.id === meState.id) ?? false
+
+    return { likedByMe: isLiked, likeCount: count }
+  }, [dataLikes, meState.id])
 
   const {
     data: dataRecommendation,
@@ -78,6 +90,10 @@ const Detail = () => {
     }
   }
 
+  const sendLike = () => {
+    mutateLike();
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navigation />
@@ -107,18 +123,18 @@ const Detail = () => {
               </div>
 
               <div className="flex flex-row items-center gap-5 text-sm border-t border-b py-5">
-                <span className="flex items-center gap-2 text-sm">
+                <Link href='#' onClick={sendLike} className="flex items-center gap-2 text-sm">
                   <Image
-                    src={iconLike}
+                    src={likedByMe ? iconLiked : iconLike}
                     width={20}
                     height={20}
                     alt="Icon Like"
                     className="shrink-0 object-contain"
                   />
-                  {dataPostDetail?.likes}
-                </span>
+                  {likeCount ?? dataPostDetail?.likes}
+                </Link>
 
-                <a href="#" onClick={() => setIsDialogCommentOpen(!isDialogCommentOpen)} className="flex items-center gap-2 text-sm">
+                <Link href="#" onClick={() => setIsDialogCommentOpen(!isDialogCommentOpen)} className="flex items-center gap-2 text-sm">
                   <Image
                     src={iconComment}
                     width={20}
@@ -127,7 +143,7 @@ const Detail = () => {
                     className="shrink-0 object-contain"
                   />
                   {dataComments?.length}
-                </a>
+                </Link>
               </div>
 
               <AspectRatio ratio={16 / 9}>
