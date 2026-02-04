@@ -93,7 +93,7 @@ const Login = () => {
                     <CardTitle className="text-xl font-bold">Sign In</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-5">
-                    <form onSubmit={handleSubmit} className="grid gap-5">
+                    <form method="POST" onSubmit={handleSubmit} className="grid gap-5">
                         <div className="grid gap-4">
                             <Label htmlFor="email" className="text-sm">Email</Label>
                             <Field data-invalid={!emailValid}>
@@ -107,7 +107,7 @@ const Login = () => {
                                     value={email}
                                     aria-invalid={!emailValid}
                                 />
-                                {!emailValid && (<FieldLabel className="text-xs colorerrormsg" htmlFor="input-invalid">Email required</FieldLabel>)}
+                                {!emailValid && (<FieldLabel className="text-xs colorerrormsg" >Email required</FieldLabel>)}
                             </Field>
                         </div>
 
@@ -141,12 +141,12 @@ const Login = () => {
                                         />
                                     </button>
                                 </div>
-                                {!passwdValid && (<FieldLabel className="text-xs colorerrormsg" htmlFor="input-invalid">Password required</FieldLabel>)}
+                                {!passwdValid && (<FieldLabel className="text-xs colorerrormsg" >Password required</FieldLabel>)}
                             </Field>
                         </div>
 
                         <div className="grid gap-4">
-                            {loginGagal && (<FieldLabel className="text-xs colorerrormsg" htmlFor="input-invalid">Login gagal. Periksa kembali email dan password.</FieldLabel>)}
+                            {loginGagal && (<FieldLabel className="text-xs colorerrormsg" >Login gagal. Periksa kembali email dan password.</FieldLabel>)}
                             <Button
                                 disabled={isPending}
                                 onClick={onLogin}

@@ -134,7 +134,7 @@ const Register = () => {
                     <CardTitle className="text-xl font-bold">Sign Up</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-5">
-                    <form onSubmit={handleSubmit} className="grid gap-5">
+                    <form method="POST" onSubmit={handleSubmit} className="grid gap-5">
                         <div className="grid gap-4">
                             <Label htmlFor="name" className="text-sm">Name</Label>
                             <Field data-invalid={!nameValid}>
@@ -148,7 +148,7 @@ const Register = () => {
                                     value={name}
                                     aria-invalid={!nameValid}
                                 />
-                                {!nameValid && (<FieldLabel className="text-xs colorerrormsg" htmlFor="input-invalid">Name required</FieldLabel>)}
+                                {!nameValid && (<FieldLabel className="text-xs colorerrormsg">Name required</FieldLabel>)}
                             </Field>
 
                         </div>
@@ -166,7 +166,7 @@ const Register = () => {
                                     value={email}
                                     aria-invalid={!emailValid}
                                 />
-                                {!emailValid && (<FieldLabel className="text-xs colorerrormsg" htmlFor="input-invalid">Email required</FieldLabel>)}
+                                {!emailValid && (<FieldLabel className="text-xs colorerrormsg">Email required</FieldLabel>)}
                             </Field>
                         </div>
 
@@ -201,7 +201,7 @@ const Register = () => {
                                         />
                                     </button>
                                 </div>
-                                {!passwdValid && (<FieldLabel className="text-xs colorerrormsg" htmlFor="input-invalid">Password required</FieldLabel>)}
+                                {!passwdValid && (<FieldLabel className="text-xs colorerrormsg">Password required</FieldLabel>)}
                             </Field>
 
                         </div>
@@ -237,7 +237,7 @@ const Register = () => {
                                         />
                                     </button>
                                 </div>
-                                {!confirmpasswdValid && (<FieldLabel className="text-xs colorerrormsg" htmlFor="input-invalid">Confirm password required</FieldLabel>)}
+                                {!confirmpasswdValid && (<FieldLabel className="text-xs colorerrormsg">Confirm password required</FieldLabel>)}
                             </Field>
 
 

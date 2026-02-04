@@ -5,13 +5,13 @@ import Footer from "@/components/Footer";
 import { useGetMe } from "../(getme)/hooksGetMe";
 import { useAppSelector } from "@/redux/3_redux";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { iconPageNext, iconPagePrevious, tmpProfilePicture } from "../../../public/asset/asset";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { iconAddPicture, iconEye, iconEyeOff, iconPageNext, iconPagePrevious, tmpProfilePicture } from "../../../public/asset/asset";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useGetComments, useGetLikes, useGetMyPosts } from "./hooksMyProfile";
+import { useDoDelete, useDoUpdatePassword, useDoUpdateProfile, useGetComments, useGetLikes, useGetMyPosts } from "./hooksMyProfile";
 import { BlogCardSkeleton } from "@/components/BlogCardSkeleton";
 import BlogCard from "@/components/BlogCard";
 import {
@@ -23,6 +23,13 @@ import {
 } from "@/components/ui/dialog"
 import { BiLike } from "react-icons/bi";
 import { VscComment } from "react-icons/vsc";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
+import { AxiosError } from "axios";
+import { ApiErrorResponse } from "@/types/apiresponse";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Field, FieldLabel } from "@/components/ui/field";
 
 
 
@@ -39,6 +46,7 @@ const Profile = () => {
         }
     }, [authState.accessToken, authState.isLoggedin, router]);
 
+    // posts
     const [isDialogStatisticOpen, setIsDialogStatisticOpen] = useState(false);
     const [idStatistic, setIdStatistic] = useState(0);
     const [isDialogDeleteOpen, setIsDialogDeleteOpen] = useState(false);
@@ -53,6 +61,8 @@ const Profile = () => {
 
     const { data: dataLikes } = useGetLikes(idStatistic);
     const { data: dataComments } = useGetComments(idStatistic);
+
+    const { mutate: mutateHapus, isPending: ispendingHapus } = useDoDelete();
 
     const handlePageNextPrev = (i: number) => {
         let valPageQuery = pageQuery + i;
@@ -84,6 +94,200 @@ const Profile = () => {
         setIsDialogDeleteOpen(openDialogDeleteParam);
     }
 
+    const handleDoDelete = () => {
+        if (idDelete && idDelete > 0) {
+            mutateHapus(idDelete, {
+                onSuccess: () => {
+                    toast.success('Berhasil menghapus', { position: "bottom-center" });
+                    setIsDialogDeleteOpen(false);
+                },
+                onError: (e) => {
+                    const error = e as AxiosError<ApiErrorResponse>;
+                    const serverMessage = error.response?.data?.message || error.message;
+                    toast.error(`Gagal menghapus. Status: ${serverMessage}`, { position: "bottom-center" })
+                }
+            });
+        }
+    }
+    // posts
+
+    // change password
+    const [currentPassword, setCurrentPassword] = useState("");
+    const [currentPasswordValid, setCurrentPasswordValid] = useState(true);
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [newPassword, setNewPassword] = useState("");
+    const [newPasswordValid, setNewPasswordValid] = useState(true);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [confirmNewPassword, setConfirmNewPassword] = useState("");
+    const [confirmNewPasswordValid, setConfirmNewPasswordValid] = useState(true);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const [updatePasswordGagal, setUpdatePasswordGagal] = useState(false);
+    const [updatePasswordGagalMsg, setUpdatePasswordGagalMsg] = useState("");
+    const { mutate: mutateGantiPassword, isPending: ispendingGantiPassword } = useDoUpdatePassword();
+
+    const handleCurrentPasswordChange = (text: string) => {
+        setCurrentPassword(text);
+        setCurrentPasswordValid(text.length > 0);
+    }
+
+    const handleNewPasswordChange = (text: string) => {
+        setNewPassword(text);
+        setNewPasswordValid(text.length > 0);
+    }
+
+    const handleConfirmNewPasswordChange = (text: string) => {
+        setConfirmNewPassword(text);
+        setConfirmNewPasswordValid(text.length > 0);
+    }
+
+    const onChangePassword = () => {
+        setUpdatePasswordGagal(false);
+        setUpdatePasswordGagalMsg("");
+        const varIsCurrentPasswordValid = currentPassword.length > 0;
+        const varIsNewPasswordValid = newPassword.length > 0;
+        const varIsConfirmNewPasswordValid = (confirmNewPassword.length > 0);
+
+        setCurrentPasswordValid(varIsCurrentPasswordValid);
+        setNewPasswordValid(varIsNewPasswordValid);
+        setConfirmNewPasswordValid(varIsConfirmNewPasswordValid);
+
+        if (newPassword !== confirmNewPassword) {
+            setNewPasswordValid(false);
+            setConfirmNewPasswordValid(false);
+            setUpdatePasswordGagal(true);
+            setUpdatePasswordGagalMsg("New password dan Confirm new password harus sama.");
+            return;
+        }
+
+        if (varIsCurrentPasswordValid && varIsNewPasswordValid && varIsConfirmNewPasswordValid) {
+            mutateGantiPassword({
+                currentPassword: currentPassword,
+                newPassword: newPassword,
+                confirmPassword: confirmNewPassword,
+            }, {
+                onSuccess() {
+                    toast.success('Password berhasil diganti.', { position: 'bottom-center' });
+                    setCurrentPassword('');
+                    setNewPassword('');
+                    setConfirmNewPassword('');
+                },
+                onError(e) {
+                    const error = e as AxiosError<ApiErrorResponse>;
+                    const serverMessage = error.response?.data?.message || error.message;
+                    setUpdatePasswordGagal(true);
+                    setUpdatePasswordGagalMsg(`${serverMessage}`);
+                }
+            })
+        } else {
+            setUpdatePasswordGagal(true);
+            setUpdatePasswordGagalMsg("Lengkapi data Current password, New password dan Confirm new password.");
+        }
+    }
+
+    const handleOnChangePassword = (e: React.FormEvent) => {
+        e.preventDefault();
+        onChangePassword();
+    }
+    // change password
+
+    // update profile
+    const profileImageMaxSize = 5 * 1024 * 1024;
+    const [isDialogUpdateProfileOpen, setIsDialogUpdateProfileOpen] = useState(false);
+    const [name, setName] = useState(dataMe?.name ?? "");
+    const [nameValid, setNameValid] = useState(true);
+    const [headline, setHeadline] = useState(dataMe?.headline ?? "");
+    const [headlineValid, setHeadlineValid] = useState(true);
+    const [updateProfileErrMsg, setUpdateProfileErrMsg] = useState("");
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [avatar, setAvatar] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    const { mutate: mutateUpdateProfile, isPending: isPendingUpdateProfile } = useDoUpdateProfile();
+
+    const handleImageClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+
+        if (file) {
+
+            if (file.size > profileImageMaxSize) {
+                setUpdateProfileErrMsg("Gambar maximum 5MB");
+            } else {
+                setUpdateProfileErrMsg("");
+            }
+
+            setAvatar(file);
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url);
+        }
+    };
+
+    const handleName = (text: string) => {
+        setName(text);
+        setNameValid(text.length > 0);
+    }
+
+    const handleHeadline = (text: string) => {
+        setHeadline(text);
+        setHeadlineValid(text.length > 0);
+    }
+
+    const handleDialogUpdateProfileOpen = (b: boolean) => {
+        setIsDialogUpdateProfileOpen(b);
+        setName(dataMe?.name ?? "");
+        setHeadline(dataMe?.headline ?? "");
+    }
+
+    const onUpdateProfile = (e: React.FormEvent) => {
+        e.preventDefault();
+        setUpdateProfileErrMsg("");
+
+        const isNameValid = name.trim().length > 0;
+        const isHeadlineValid = headline.trim().length > 0;
+        setNameValid(isNameValid);
+        setHeadlineValid(isHeadlineValid);
+
+        if (!isNameValid || !isHeadlineValid) {
+            setUpdateProfileErrMsg("Lengkapi data Name dan Headline.");
+            return;
+        }
+
+        if (avatar) {
+            if (avatar.size > profileImageMaxSize) {
+                setUpdateProfileErrMsg("Gambar maximum 5MB.");
+                return;
+            }
+        }
+
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("headline", headline);
+        if (avatar) {
+            formData.append("avatar", avatar);
+        }
+
+
+        mutateUpdateProfile(formData, {
+            onSuccess() {
+                toast.success('Profile berhasil diperbarui.', { position: "bottom-center" });
+                setIsDialogUpdateProfileOpen(false);
+                setAvatar(null);
+                setPreviewUrl(null);
+            },
+            onError(e) {
+                const error = e as AxiosError<ApiErrorResponse>;
+                const serverMessage = error.response?.data?.message || error.message;
+                setUpdateProfileErrMsg(serverMessage);
+            }
+        });
+    };
+    // update profile
+
     return (
         <div className="min-h-screen flex flex-col">
             <Navigation />
@@ -102,7 +306,7 @@ const Profile = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-row gap-2 items-center justify-end w-1/4">
-                                    <Button variant='link' className="font-semibold underline">
+                                    <Button onClick={() => handleDialogUpdateProfileOpen(true)} variant='link' className="font-semibold underline">
                                         Edit Profile
                                     </Button>
                                 </div>
@@ -211,16 +415,105 @@ const Profile = () => {
                             </TabsContent>
 
                             <TabsContent value="changepassword" className="mt-6">
-                                Change Password Content Here
+                                <div className="w-full max-w-134.5 flex flex-col gap-5 py-2 ">
+                                    <form method="POST" onSubmit={handleOnChangePassword} className="grid gap-5">
+                                        <div className="grid gap-4">
+                                            <Label htmlFor="currentPassword" className="text-sm">Current Password</Label>
+                                            <Field data-invalid={!currentPasswordValid}>
+                                                <div className="relative">
+                                                    <Input
+                                                        id="currentPassword"
+                                                        type={showCurrentPassword ? "text" : "password"}
+                                                        placeholder="Enter current password"
+                                                        className="pr-10 h-12 rounded-xl text-sm"
+                                                        value={currentPassword}
+                                                        onChange={(e) => handleCurrentPasswordChange(e.target.value)}
+                                                        aria-invalid={!currentPasswordValid}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 opacity-70"
+                                                    >
+                                                        <Image src={showCurrentPassword ? iconEyeOff : iconEye} alt="toggle" width={20} height={20} />
+                                                    </button>
+                                                </div>
+                                                {!currentPasswordValid && (<FieldLabel className="text-xs colorerrormsg">Current password required</FieldLabel>)}
+                                            </Field>
+                                        </div>
+
+                                        <div className="grid gap-4">
+                                            <Label htmlFor="newPassword" className="text-sm">New Password</Label>
+                                            <Field data-invalid={!newPasswordValid}>
+                                                <div className="relative">
+                                                    <Input
+                                                        id="newPassword"
+                                                        type={showNewPassword ? "text" : "password"}
+                                                        placeholder="Enter new password"
+                                                        className="pr-10 h-12 rounded-xl text-sm"
+                                                        value={newPassword}
+                                                        onChange={(e) => handleNewPasswordChange(e.target.value)}
+                                                        aria-invalid={!newPasswordValid}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 opacity-70"
+                                                    >
+                                                        <Image src={showNewPassword ? iconEyeOff : iconEye} alt="toggle" width={20} height={20} />
+                                                    </button>
+                                                </div>
+                                                {!newPasswordValid && (<FieldLabel className="text-xs colorerrormsg">New password required</FieldLabel>)}
+                                            </Field>
+                                        </div>
+
+                                        <div className="grid gap-4">
+                                            <Label htmlFor="confirmPassword" className="text-sm">Confirm New Password</Label>
+                                            <Field data-invalid={!confirmNewPasswordValid}>
+                                                <div className="relative">
+                                                    <Input
+                                                        id="confirmPassword"
+                                                        type={showConfirmPassword ? "text" : "password"}
+                                                        placeholder="Enter confirm new password"
+                                                        className="pr-10 h-12 rounded-xl text-sm"
+                                                        value={confirmNewPassword}
+                                                        onChange={(e) => handleConfirmNewPasswordChange(e.target.value)}
+                                                        aria-invalid={!confirmNewPasswordValid}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 opacity-70"
+                                                    >
+                                                        <Image src={showConfirmPassword ? iconEyeOff : iconEye} alt="toggle" width={20} height={20} />
+                                                    </button>
+                                                </div>
+                                                {!confirmNewPasswordValid && (<FieldLabel className="text-xs colorerrormsg">Confirm new password required</FieldLabel>)}
+                                            </Field>
+                                        </div>
+
+                                        <div className="grid gap-4 pt-2">
+                                            {updatePasswordGagal && (<FieldLabel className="text-xs colorerrormsg">{updatePasswordGagalMsg}</FieldLabel>)}
+                                            <Button
+                                                disabled={ispendingGantiPassword}
+                                                onClick={onChangePassword}
+                                                type="submit"
+                                                className="w-full px-10 rounded-full h-12 text-sm"
+                                            >
+                                                {ispendingGantiPassword && (<Spinner />)}
+                                                Update Password
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </div>
                             </TabsContent>
                         </Tabs>
                     </div>
                 )}
 
                 <Dialog open={isDialogStatisticOpen} onOpenChange={() => setIsDialogStatisticOpen(!isDialogStatisticOpen)}>
-
                     <DialogContent className="md:max-w-153.25 md:max-h-225.5 min-h-[50vh] flex flex-col p-0 gap-0 overflow-hidden">
-                        <DialogHeader className="p-6 pb-2 flex-none">
+                        <DialogHeader className="px-6 h-16 flex flex-row items-center justify-between flex-none ">
                             <DialogTitle className="text-xl font-bold">
                                 Statistic
                             </DialogTitle>
@@ -302,18 +595,114 @@ const Profile = () => {
                 </Dialog>
 
                 <Dialog open={isDialogDeleteOpen} onOpenChange={() => setIsDialogDeleteOpen(!isDialogDeleteOpen)}>
-
                     <DialogContent className="md:max-w-134.25 flex flex-col gap-4 overflow-hidden rounded-3xl p-3">
-                        <DialogHeader className="p-6 pb-2 flex-none">
+                        <DialogHeader className="px-6 h-16 flex flex-row items-center justify-between flex-none ">
                             <DialogTitle className="text-xl font-bold">
                                 Delete
                             </DialogTitle>
                         </DialogHeader>
                         <p className="mx-6">Are you sure to delete?</p>
-                        <DialogFooter className="justify-end px-6">
-                            <Button variant={'ghost'} className="rounded-full text-sm w-full max-w-42.75 h-12">Cancel</Button>
-                            <Button className="rounded-full text-sm font-semibold bg-danger w-full max-w-42.75 h-12">Delete</Button>
+                        <DialogFooter className="flex flex-row justify-end px-6">
+                            <Button variant={'ghost'} className="rounded-full text-sm w-full md:max-w-30 max-w-[156.5px] h-12">Cancel</Button>
+                            <Button
+                                disabled={ispendingHapus}
+                                onClick={handleDoDelete}
+                                className="rounded-full text-sm font-semibold bg-danger w-full md:max-w-42.75 max-w-[156.5px] h-12">
+                                {ispendingHapus && (<Spinner />)}
+                                Delete</Button>
                         </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
+                <Dialog open={isDialogUpdateProfileOpen}
+                    onOpenChange={() => setIsDialogUpdateProfileOpen(!isDialogUpdateProfileOpen)}>
+                    <DialogContent className="w-[92%] md:w-full max-w-112.75 flex flex-col p-0 gap-0"
+                        onOpenAutoFocus={(e) => {
+                            e.preventDefault();
+                            document.getElementById("imagetoedit")?.focus();
+                        }}
+                    >
+                        <DialogHeader className="px-6 h-16 flex flex-row items-center justify-between flex-none">
+                            <DialogTitle className="text-xl font-bold">
+                                Edit Profile
+                            </DialogTitle>
+                        </DialogHeader>
+                        <div className="w-full flex flex-col gap-5 px-6 pb-6">
+                            <form method="POST" onSubmit={onUpdateProfile} className="grid gap-5">
+                                <div className="relative flex w-20 h-20 mx-auto">
+                                    <div className="flex flex-col items-center justify-center w-20 h-20 border rounded-full overflow-hidden mx-auto">
+                                        <Image
+                                            /* src={dataMe?.avatarUrl ?? tmpProfilePicture}  */
+                                            id="imagetoedit"
+                                            src={previewUrl || dataMe?.avatarUrl || tmpProfilePicture}
+                                            alt="profile"
+                                            width={80}
+                                            height={80}
+                                            className="w-20 h-20" />
+                                    </div>
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        className="hidden"
+                                        accept="image/*"
+                                        onChange={handleImageChange}
+                                    />
+                                    <Button
+                                        asChild
+                                        type="button"
+                                        onClick={handleImageClick}
+                                        className="absolute -right-4 -bottom-5 cursor-pointer w-15 h-15"
+                                        variant={'transparent'}>
+                                        <a href="#">
+                                            <Image src={iconAddPicture} alt="add picture" width={24} height={24} />
+                                        </a>
+                                    </Button>
+                                </div>
+                                <div className="grid gap-4">
+                                    <Label htmlFor="name" className="text-sm">Name</Label>
+                                    <Field data-invalid={!nameValid}>
+                                        <Input
+                                            id="name"
+                                            type="text"
+                                            placeholder="Enter your name"
+                                            className="pr-10 h-12 rounded-xl text-sm"
+                                            required
+                                            onChange={(e) => handleName(e.target.value)}
+                                            value={name}
+                                            aria-invalid={!nameValid}
+                                        />
+                                        {!nameValid && (<FieldLabel className="text-xs colorerrormsg" >Name required</FieldLabel>)}
+                                    </Field>
+                                </div>
+
+                                <div className="grid gap-4">
+                                    <Label htmlFor="headline" className="text-sm">Profile Headline</Label>
+                                    <Field data-invalid={!headlineValid}>
+                                        <Input
+                                            id="headline"
+                                            type="text"
+                                            placeholder="Enter your headline"
+                                            className="pr-10 h-12 rounded-xl text-sm"
+                                            required
+                                            onChange={(e) => handleHeadline(e.target.value)}
+                                            value={headline}
+                                            aria-invalid={!headlineValid}
+                                        />
+                                        {!headlineValid && (<FieldLabel className="text-xs colorerrormsg" >Headline required</FieldLabel>)}
+                                    </Field>
+                                </div>
+
+                                <div className="grid gap-4">
+                                    {updateProfileErrMsg.length > 0 && (<FieldLabel className="text-xs colorerrormsg" >{updateProfileErrMsg}</FieldLabel>)}
+                                    <Button
+                                        disabled={isPendingUpdateProfile}
+                                        onClick={onUpdateProfile}
+                                        className="w-full rounded-full h-12 text-sm">
+                                        {isPendingUpdateProfile && (<Spinner />)}
+                                        Update Profile</Button>
+                                </div>
+                            </form>
+                        </div>
                     </DialogContent>
                 </Dialog>
 

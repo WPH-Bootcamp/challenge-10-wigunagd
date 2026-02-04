@@ -6,3 +6,8 @@ export interface ApiErrorResponse {
   path?: string;
   details?: string[];
 }
+
+export interface GenericResponse {
+  success: boolean;
+  message: string;
+}

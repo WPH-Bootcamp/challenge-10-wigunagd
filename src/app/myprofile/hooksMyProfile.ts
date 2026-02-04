@@ -1,12 +1,14 @@
 import { BlogResponse } from "@/types/blog"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { AxiosError } from "axios"
-import { getComments, getLikes, getMyPosts } from "./apiMyProfile"
+import { doDelete, doUpdatePassword, doUpdateProfile, getComments, getLikes, getMyPosts } from "./apiMyProfile"
 import { PostCommentList, PostLikeList } from "@/types/commentlike"
+import { GenericResponse } from "@/types/apiresponse"
+import { ChangePasswordRequestBody } from "@/types/profile"
 
 export const useGetMyPosts = (params: BlogResponse) => {
     return useQuery<BlogResponse, AxiosError>({
-        queryKey: ['recommendations', params],
+        queryKey: ['MyPosts'],
         queryFn: () => getMyPosts(params)
     })
 }
@@ -24,5 +26,31 @@ export const useGetComments = (id: number) => {
         queryKey: ['commentList', id],
         queryFn: () => getComments(id),
         enabled: !!id && id > 0
+    })
+}
+
+export const useDoDelete = () => {
+    const queryClient = useQueryClient();
+    return useMutation<GenericResponse, AxiosError, number>({
+        mutationFn: (id: number) => doDelete(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['MyPosts']});
+        }
+    })
+}
+
+export const useDoUpdatePassword = () => {
+    return useMutation<GenericResponse, AxiosError, ChangePasswordRequestBody>({
+        mutationFn: (body) => doUpdatePassword(body)
+    })
+}
+
+export const useDoUpdateProfile = () => {
+    const queryClient = useQueryClient();
+    return useMutation<GenericResponse, AxiosError, FormData>({
+        mutationFn: (body) => doUpdateProfile(body),
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['me']});
+        }
     })
 }
