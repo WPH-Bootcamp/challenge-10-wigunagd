@@ -33,6 +33,7 @@ export interface BlogResponse {
     page?: number;
     lastPage?: number;
     query?: string;
+    byUserName?: string;
 }
 
 // author/user profile
