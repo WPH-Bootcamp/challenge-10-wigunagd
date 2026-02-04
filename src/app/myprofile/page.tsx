@@ -362,11 +362,11 @@ const Profile = () => {
                             </TabsList>
 
                             <TabsContent value="yourpost" className="mt-6">
-                                {isLoadingPosts && (
+                                {(isLoadingPosts || isLoadingDataMe) && (
                                     <BlogCardSkeleton />
                                 )}
 
-                                {!isLoadingPosts && (dataPosts?.data?.length ?? 0) < 1 && (
+                                {!isLoadingPosts && !isLoadingDataMe && (dataPosts?.data?.length ?? 0) < 1 && (
                                     <div className="w-full flex flex-col relative items-center text-center mt-[55.5px] md:px-0 px-16 gap-4">
                                         <Image src={iconBlankDocument} width={118} height={135} alt="No Result" />
                                         <b className="text-sm">Your writing journey starts here</b>
@@ -386,27 +386,23 @@ const Profile = () => {
                                             />
                                         </div>
                                         {
-                                            (isLoadingPosts || isFetchingPosts) ? (
-                                                <BlogCardSkeleton />
-                                            ) : (
-                                                dataPosts?.data?.map((post) => (
-                                                    <BlogCard
-                                                        key={post.id}
-                                                        id={post.id}
-                                                        title={post.title}
-                                                        content={post.content}
-                                                        tags={post.tags}
-                                                        imageUrl={post.imageUrl}
-                                                        author={post.author}
-                                                        createdAt={post.createdAt}
-                                                        likes={post.likes}
-                                                        comments={post.comments}
-                                                        action
-                                                        onStatistikClick={(id: number) => onStatistikClick({ id, openDialogStatisticParam: true })}
-                                                        onDeleteClick={(id: number) => onDeleteClick({ id, openDialogDeleteParam: true })}
-                                                    />
-                                                ))
-                                            )
+                                            dataPosts?.data?.map((post) => (
+                                                <BlogCard
+                                                    key={post.id}
+                                                    id={post.id}
+                                                    title={post.title}
+                                                    content={post.content}
+                                                    tags={post.tags}
+                                                    imageUrl={post.imageUrl}
+                                                    author={post.author}
+                                                    createdAt={post.createdAt}
+                                                    likes={post.likes}
+                                                    comments={post.comments}
+                                                    action
+                                                    onStatistikClick={(id: number) => onStatistikClick({ id, openDialogStatisticParam: true })}
+                                                    onDeleteClick={(id: number) => onDeleteClick({ id, openDialogDeleteParam: true })}
+                                                />
+                                            ))
                                         }
                                     </div>
                                 )}
@@ -612,13 +608,13 @@ const Profile = () => {
                                 <div className="flex flex-col gap-2">
                                     {
                                         dataComments?.map((comment, i) => (
-                                            <div key={i} className={`flex flex-row py-3 gap-3 ${i < (dataComments.length - 1) ? 'border-b' : ''}`}>
+                                            <Link href={`/profile/${comment.author.id}`} key={i} target="_blank" className={`flex flex-row py-3 gap-3 ${i < (dataComments.length - 1) ? 'border-b' : ''}`}>
                                                 <Image src={comment.author.avatarUrl ?? tmpProfilePicture} alt={comment.author.name} width={48} height={48} className="w-12 h-12 rounded-full" />
                                                 <div className="flex flex-col gap-1">
                                                     <span className="text-sm font-semibold">{comment.author.name}</span>
                                                     <span className="text-sm">{comment.author.headline}</span>
                                                 </div>
-                                            </div>
+                                            </Link>
                                         ))
                                     }
                                 </div>

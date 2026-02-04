@@ -81,11 +81,11 @@ const Profile = () => {
                             </div>
                         )}
 
-                        {isLoadingPosts && (
+                        {(isLoadingPosts || isLoadingProfile) && (
                             <BlogCardSkeleton />
                         )}
 
-                        {!isLoadingPosts && (dataPosts?.data?.length ?? 0) < 1 && (
+                        {!isLoadingPosts && !isLoadingProfile && (dataPosts?.data?.length ?? 0) < 1 && (
                             <div className="w-full flex flex-col relative items-center text-center mt-[60px] md:px-0 px-16 gap-4">
                                 <Image src={iconBlankDocument} width={118} height={135} alt="No Result" />
                                 <b className="text-sm">No posts from this user yet</b>
@@ -100,24 +100,20 @@ const Profile = () => {
 
                                 </div>
                                 {
-                                    (isLoadingPosts || isFetchingPosts) ? (
-                                        <BlogCardSkeleton />
-                                    ) : (
-                                        dataPosts?.data?.map((post) => (
-                                            <BlogCard
-                                                key={post.id}
-                                                id={post.id}
-                                                title={post.title}
-                                                content={post.content}
-                                                tags={post.tags}
-                                                imageUrl={post.imageUrl}
-                                                author={post.author}
-                                                createdAt={post.createdAt}
-                                                likes={post.likes}
-                                                comments={post.comments}
-                                            />
-                                        ))
-                                    )
+                                    dataPosts?.data?.map((post) => (
+                                        <BlogCard
+                                            key={post.id}
+                                            id={post.id}
+                                            title={post.title}
+                                            content={post.content}
+                                            tags={post.tags}
+                                            imageUrl={post.imageUrl}
+                                            author={post.author}
+                                            createdAt={post.createdAt}
+                                            likes={post.likes}
+                                            comments={post.comments}
+                                        />
+                                    ))
                                 }
                             </div>
                         )}
