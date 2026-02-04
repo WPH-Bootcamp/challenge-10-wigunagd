@@ -1,6 +1,6 @@
 'use client'
 
-import { logo, iconMenu, iconMenuClose, iconSearch, iconLogOut, iconUser, iconWritePost, tmpProfilePicture } from "../../public/asset/asset";
+import { logo, iconMenu, iconMenuClose, iconSearch, iconWritePost } from "../../public/asset/asset";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
@@ -9,15 +9,11 @@ import { useGetSearch } from "@/app/(SearchQuery)/hooksSearchQuery";
 import SearchResultView from "./SearchResultView";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/redux/3_redux";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
+
 import { logout } from "@/redux/1_authSlice";
 import { useGetMe } from "@/app/(getme)/hooksGetMe";
 import { setMeData } from "@/redux/1_meSlice";
+import NavigationProfilePart from "./NavigationProfilePart";
 
 const MotionButton = motion.create(Button);
 
@@ -27,8 +23,8 @@ const Navigation = () => {
     const { data: dataMe } = useGetMe({ enabled: isuser });
     const dispatch = useAppDispatch();
 
-    useEffect(() =>{
-        if(dataMe){
+    useEffect(() => {
+        if (dataMe) {
             dispatch(setMeData(dataMe))
         }
     }, [dataMe, dispatch]);
@@ -87,6 +83,10 @@ const Navigation = () => {
     const handleTextSearch = (text: string) => {
         setsetSearchText(text);
         setIsOpenSearch(true);
+    }
+
+    const handleLogout = () => {
+        dispatch(logout());
     }
 
     return (
@@ -187,29 +187,11 @@ const Navigation = () => {
                                 </Link>
                             </Button>
 
-                            <DropdownMenu modal={false} key={`dropdownMenuProfile`}>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant={'ghost'} className="h-auto py-1 flex items-center gap-3">
-                                        <div className="flex items-center justify-center w-10 h-10 border rounded-full overflow-hidden">
-                                            <Image src={dataMe?.avatarUrl ?? tmpProfilePicture} alt="profile" width={40} height={40} className="w-10 h-10" />
-                                        </div>
-                                        <span className="hidden md:inline">{dataMe?.name}</span>
-                                    </Button>
-                                </DropdownMenuTrigger>
-
-                                <DropdownMenuContent className="w-[182px] mt-1 rounded-lg grid gap-4 p-2" align="end">
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/myprofile" className="flex gap-2 cursor-pointer">
-                                            <Image src={iconUser} width={20} height={20} alt="profile" />Profile
-                                        </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => dispatch(logout())} className="cursor-pointer">
-                                        <div className="flex gap-2">
-                                            <Image src={iconLogOut} width={20} height={20} alt="logout" />Logout
-                                        </div>
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                            <NavigationProfilePart
+                                avatarUrl={dataMe?.avatarUrl ?? null}
+                                name={dataMe?.name ?? null}
+                                handleLogout={handleLogout}
+                            />
                         </div>
                     )}
                     {/* saat sudah login */}

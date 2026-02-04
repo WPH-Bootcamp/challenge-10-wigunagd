@@ -37,7 +37,7 @@ import ProfileSkeleton from "@/components/ProfileSkeleton";
 
 
 
-const Profile = () => {
+const MyProfile = () => {
     const authState = useAppSelector((state) => state.auth);
     const isuser = (authState.accessToken !== "" && authState.isLoggedin);
     const { data: dataMe, isLoading: isLoadingDataMe } = useGetMe({ enabled: isuser });
@@ -741,4 +741,4 @@ const Profile = () => {
     );
 }
 
-export default Profile;
+export default MyProfile;
