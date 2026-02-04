@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dialog"
 import { useGetLikes } from "@/app/myprofile/hooksMyProfile";
 import Link from "next/link";
+import CommentCard from "@/components/CommentCard";
 
 
 
@@ -117,10 +118,10 @@ const Detail = () => {
                 }
               </div>
 
-              <div className="flex flex-row items-center gap-2 text-sm">
+              <Link href={`/profile/${dataPostDetail?.author?.id}`} className="flex flex-row items-center gap-2 text-sm">
                 <Image src={dataAuthor?.avatarUrl ?? tmpProfilePicture} width={40} height={40} alt="Profile-Img" className="rounded-full w-10 h-10" />
-                <b>{dataPostDetail?.author?.name ?? 'John Doe'}</b> &middot; {dataPostDetail?.createdAt && (<span>{formattedDate(dataPostDetail?.createdAt, 'DD MMMM YYYY')}</span>)}
-              </div>
+                <b>{dataPostDetail?.author?.name ?? '...'}</b> &middot; {dataPostDetail?.createdAt && (<span>{formattedDate(dataPostDetail?.createdAt, 'DD MMMM YYYY')}</span>)}
+              </Link>
 
               <div className="flex flex-row items-center gap-5 text-sm border-t border-b py-5">
                 <Link href='#' onClick={sendLike} className="flex items-center gap-2 text-sm">
@@ -216,26 +217,13 @@ const Detail = () => {
 
                   {dataComments && dataComments.length > 0 && (
                     dataComments?.slice(0, 3).map((comment) => (
-                      <div key={comment.id}
-                        className="grid border-t py-3 text-sm gap-3">
-                        <div className="flex gap-2 items-center">
-                          <Image
-                            src={comment.author.avatarUrl
-                              ? `${comment.author.avatarUrl}`
-                              : tmpProfilePicture
-                            }
-                            alt={comment.author.name}
-                            width={40}
-                            height={40}
-                            className="rounded-full object-cover w-10 h-10"
-                          />
-                          <div className="grid gap-2">
-                            <b>{comment.author.name}</b>
-                            <span>{comment.createdAt && (formattedDate(comment.createdAt, 'DD MMMM YYYY'))}</span>
-                          </div>
-                        </div>
-                        <p>{comment.content}</p>
-                      </div>
+                      <CommentCard
+                        key={comment.id}
+                        id={comment.id}
+                        author={comment.author}
+                        createdAt={comment.createdAt}
+                        content={comment.content}
+                      />
                     ))
                   )}
 
@@ -289,26 +277,13 @@ const Detail = () => {
                         >
                           {dataComments && dataComments.length > 0 && (
                             dataComments?.map((comment) => (
-                              <div key={comment.id}
-                                className="grid border-t py-3 text-sm gap-3">
-                                <div className="flex gap-2 items-center">
-                                  <Image
-                                    src={comment.author.avatarUrl
-                                      ? `${comment.author.avatarUrl}`
-                                      : tmpProfilePicture
-                                    }
-                                    alt={comment.author.name}
-                                    width={40}
-                                    height={40}
-                                    className="rounded-full object-cover w-10 h-10"
-                                  />
-                                  <div className="grid gap-2">
-                                    <b>{comment.author.name}</b>
-                                    <span>{comment.createdAt && (formattedDate(comment.createdAt, 'DD MMMM YYYY'))}</span>
-                                  </div>
-                                </div>
-                                <p>{comment.content}</p>
-                              </div>
+                              <CommentCard
+                                key={comment.id}
+                                id={comment.id}
+                                author={comment.author}
+                                createdAt={comment.createdAt}
+                                content={comment.content}
+                              />
                             ))
                           )}
                         </div>
