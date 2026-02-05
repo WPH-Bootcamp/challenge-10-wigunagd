@@ -1,7 +1,5 @@
 'use client'
 
-import { iconArrowLeft, logo } from "../../public/asset/asset";
-import Image from "next/image";
 import { useEffect } from "react";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/redux/3_redux";

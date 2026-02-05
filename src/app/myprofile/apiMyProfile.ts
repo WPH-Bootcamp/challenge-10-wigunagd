@@ -1,6 +1,6 @@
 import { apiAxios } from "@/lib/apiAxios"
 import type { BlogResponse } from "@/types/blog"
-import { ChangePasswordRequestBody, UpdateProfileRequestBody } from "@/types/profile";
+import { ChangePasswordRequestBody } from "@/types/profile";
 
 export const getMyPosts = async ({ limit, page }: BlogResponse) => {
     const response = await apiAxios.get("/posts/my-posts", {

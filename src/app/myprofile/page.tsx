@@ -6,7 +6,7 @@ import { useGetMe } from "../(getme)/hooksGetMe";
 import { useAppSelector } from "@/redux/3_redux";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { iconAddPicture, iconBlankDocument, iconEye, iconEyeOff, iconPageNext, iconPagePrevious, iconWritePost, iconWritePostWhite, tmpProfilePicture } from "../../../public/asset/asset";
+import { iconAddPicture, iconBlankDocument, iconEye, iconEyeOff, iconPageNext, iconPagePrevious, tmpProfilePicture } from "../../../public/asset/asset";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,7 +33,6 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import Link from "next/link";
 import ButtonWriteNewPost from "./CommonComponentMyProfile";
 import ProfileSkeleton from "@/components/ProfileSkeleton";
-import { MdDelete } from "react-icons/md";
 import CommentCard from "@/components/CommentCard";
 
 
