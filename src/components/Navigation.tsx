@@ -93,7 +93,7 @@ const Navigation = () => {
 
     return (
         <header className="fixed flex w-full top-0 bg-white border-b z-50">
-            <nav className="flex w-full max-w-[1440px] h-[80px] mx-auto items-center justify-between md:px-0 px-5 relative">
+            <nav className="flex w-full max-w-[1200px] h-[80px] mx-auto items-center justify-between md:px-0 px-5 relative">
 
                 <div className="flex">
                     <Link href="/" className="flex md:text-2xl text-lg font-semibold items-center gap-2 shrink-0">

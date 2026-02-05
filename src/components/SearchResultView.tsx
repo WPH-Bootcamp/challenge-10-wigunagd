@@ -17,7 +17,18 @@ type SearchMenuViewProps = {
 
 const SearchResultView = ({ searchText, dataSearch, handleOpenSearch, isLoadingSearch, isFetchingSearch, pageSearchQuery, setPageSearchQuery }: SearchMenuViewProps) => {
     const hasData = ((dataSearch?.data?.length ?? 0) >= 1);
+    // variabel untuk pagination
     const maxPageSearch = dataSearch?.lastPage ?? 1;
+    const p = pageSearchQuery;
+    const X = maxPageSearch;
+    const n = 3;
+    let start = Math.max(1, p - Math.floor(n / 2));
+    const end = Math.min(X, start + n - 1);
+    if (end === X) {
+        start = Math.max(1, X - n + 1);
+    }
+    const pages = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    // variabel untuk pagination
 
     const handlePageSearchNextPrev = (i: number) => {
         let valPageQuery = pageSearchQuery + i;
@@ -93,19 +104,26 @@ const SearchResultView = ({ searchText, dataSearch, handleOpenSearch, isLoadingS
                         <Image src={iconPagePrevious} alt="Icon Page Previous" /> Previous
                     </Button>
 
-                    {
-                        Array.from({ length: maxPageSearch }, (_, i) => {
-                            const p = i + 1;
-                            return (
+                    <div className="flex items-center gap-2">
+                            {start > 1 && (
+                                <span className="bg-transparent px-1">...</span>
+                            )}
+
+                            {pages.map((pageNum) => (
                                 <Button
-                                    onClick={() => handlePageSearch(p)}
-                                    variant={pageSearchQuery === p ? 'default' : 'ghost'}
-                                    key={p}
+                                    key={pageNum}
+                                    onClick={() => handlePageSearch(pageNum)}
+                                    variant={p === pageNum ? 'default' : 'ghost'}
                                     className="rounded-full w-12 h-12"
-                                >{p}</Button>
-                            )
-                        })
-                    }
+                                >
+                                    {pageNum}
+                                </Button>
+                            ))}
+
+                            {end < X && (
+                                 <span className="bg-transparent px-1">...</span>
+                            )}
+                        </div>
 
                     <Button
                         disabled={pageSearchQuery === maxPageSearch}

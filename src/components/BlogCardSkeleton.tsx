@@ -5,8 +5,6 @@ export const BlogCardSkeleton = ({className} : {className?: string}) => {
     return (
         <div className={`flex flex-col w-full max-w-[1440px] px-4 md:px-0 ${className}`}>
             <BlogCardSkeletonPart />
-            <BlogCardSkeletonPart />
-            <BlogCardSkeletonPart />
         </div>
     );
 };

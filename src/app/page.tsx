@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <Navigation />
-      <main className="container mt-[80px] mx-auto w-full max-w-[1440px] py-2">
+      <main className="container mt-[80px] mx-auto w-full max-w-[1200px] py-2">
         <HomePageContent />
       </main>
       <Footer />

@@ -36,8 +36,20 @@ const Profile = () => {
         data: dataPosts,
         isLoading: isLoadingPosts,
         isFetching: isFetchingPosts
-    } = useGetProfilePosts({ byUserName: byUserName, page: pageQuery, limit: 10 });
+    } = useGetProfilePosts({ byUserName: byUserName, page: pageQuery, limit: 1 });
+
+    // variabel untuk pagination
     const maxPagePosts = dataPosts?.lastPage ?? 1;
+    const p = pageQuery;
+    const X = maxPagePosts;
+    const n = 3;
+    let start = Math.max(1, p - Math.floor(n / 2));
+    const end = Math.min(X, start + n - 1);
+    if (end === X) {
+        start = Math.max(1, X - n + 1);
+    }
+    const pages = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    // variabel untuk pagination
 
     const handlePageNextPrev = (i: number) => {
         let valPageQuery = pageQuery + i;
@@ -118,7 +130,7 @@ const Profile = () => {
                             </div>
                         )}
 
-                        {(!isLoadingPosts && maxPagePosts > 1) && (
+                        {(maxPagePosts > 1) && (
                             <div id="pagination"
                                 className={`flex flex-row w-full justify-center items-center my-2 gap-2 
                                         ${isFetchingPosts ? 'opacity-50 pointer-events-none' : ''}`}>
@@ -130,19 +142,26 @@ const Profile = () => {
                                     <Image src={iconPagePrevious} alt="Icon Page Previous" /> Previous
                                 </Button>
 
-                                {
-                                    Array.from({ length: maxPagePosts }, (_, i) => {
-                                        const p = i + 1;
-                                        return (
-                                            <Button
-                                                onClick={() => handlePage(p)}
-                                                variant={pageQuery === p ? 'default' : 'ghost'}
-                                                key={p}
-                                                className="rounded-full w-12 h-12"
-                                            >{p}</Button>
-                                        )
-                                    })
-                                }
+                                <div className="flex items-center gap-2">
+                                    {start > 1 && (
+                                        <span className="bg-transparent px-1">...</span>
+                                    )}
+
+                                    {pages.map((pageNum) => (
+                                        <Button
+                                            key={pageNum}
+                                            onClick={() => handlePage(pageNum)}
+                                            variant={p === pageNum ? 'default' : 'ghost'}
+                                            className="rounded-full w-12 h-12"
+                                        >
+                                            {pageNum}
+                                        </Button>
+                                    ))}
+
+                                    {end < X && (
+                                        <span className="bg-transparent px-1">...</span>
+                                    )}
+                                </div>
 
                                 <Button
                                     disabled={pageQuery === maxPagePosts}

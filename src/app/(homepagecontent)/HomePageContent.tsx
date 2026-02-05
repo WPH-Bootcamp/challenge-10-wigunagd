@@ -24,7 +24,18 @@ const HomePageContent = () => {
         isFetching: isFetchingMostLiked
     } = useGetMostLiked({ page: pageQuery, limit: 10 });
 
+    // variabel untuk pagination
     const maxPageRecommendation = dataRecommendation?.lastPage ?? 1;
+    const p = pageQuery;
+    const X = maxPageRecommendation;
+    const n = 3;
+    let start = Math.max(1, p - Math.floor(n / 2));
+    const end = Math.min(X, start + n - 1);
+    if (end === X) {
+        start = Math.max(1, X - n + 1);
+    }
+    const pages = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    // variabel untuk pagination
 
     const handlePageNextPrev = (i: number) => {
         let valPageQuery = pageQuery + i;
@@ -60,7 +71,7 @@ const HomePageContent = () => {
     }, [isFetchingRecommendation, isLoadingRecommendation, dataRecommendation]);
 
     return (
-        <div className="md:flex grid w-full max-w-[1440px] md:mx-0 md:mb-15 md:px-0 px-4 gap-5">
+        <div className="md:flex grid w-full max-w-[1200px] md:mx-0 md:mb-15 md:px-0 px-4 gap-5">
             <aside className="md:w-3/4 md:border-r-2 md:pr-10 relative">
                 <h1 id="recomendation" className="text-3xl font-bold mt-7">Recommend For You </h1>
 
@@ -88,7 +99,7 @@ const HomePageContent = () => {
                     }
                 </div>
 
-                {(!isLoadingRecommendation && maxPageRecommendation > 1) && (
+                {(maxPageRecommendation > 1) && (
                     <div id="pagination"
                         className={`flex flex-row w-full justify-center items-center my-2 gap-2 
                     ${isFetchingRecommendation ? 'opacity-50 pointer-events-none' : ''}`}>
@@ -100,19 +111,26 @@ const HomePageContent = () => {
                             <Image src={iconPagePrevious} alt="Icon Page Previous" /> Previous
                         </Button>
 
-                        {
-                            Array.from({ length: maxPageRecommendation }, (_, i) => {
-                                const p = i + 1;
-                                return (
-                                    <Button
-                                        onClick={() => handlePage(p)}
-                                        variant={pageQuery === p ? 'default' : 'ghost'}
-                                        key={p}
-                                        className="rounded-full w-12 h-12"
-                                    >{p}</Button>
-                                )
-                            })
-                        }
+                        <div className="flex items-center gap-2">
+                            {start > 1 && (
+                                <span className="bg-transparent px-1">...</span>
+                            )}
+
+                            {pages.map((pageNum) => (
+                                <Button
+                                    key={pageNum}
+                                    onClick={() => handlePage(pageNum)}
+                                    variant={p === pageNum ? 'default' : 'ghost'}
+                                    className="rounded-full w-12 h-12"
+                                >
+                                    {pageNum}
+                                </Button>
+                            ))}
+
+                            {end < X && (
+                                 <span className="bg-transparent px-1">...</span>
+                            )}
+                        </div>
 
                         <Button
                             disabled={pageQuery === maxPageRecommendation}

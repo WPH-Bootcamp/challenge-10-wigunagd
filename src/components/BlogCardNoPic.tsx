@@ -6,7 +6,7 @@ import Link from "next/link";
 
 const BlogCardNoPic = ({ id, title, content, likes, comments }: BlogPost) => {
     return (
-        <div className="flex flex-row w-full gap-4 border-b-2 py-7" id={(id ?? "").toString()}>
+        <div className="flex flex-row w-full max-w-[361px] md:max-w-[297px] gap-4 border-b-2 py-7" id={(id ?? "").toString()}>
             <div className="w-full flex flex-col gap-3">
                 <Link href={`/detail/${id}`} className="text-xl font-bold">{title}</Link>
                 <div className="text-ellipsis text-sm line-clamp-2">
