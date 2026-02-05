@@ -697,13 +697,14 @@ const MyProfile = () => {
                                 <div className="relative flex w-20 h-20 mx-auto">
                                     <div className="flex flex-col items-center justify-center w-20 h-20 border rounded-full overflow-hidden mx-auto">
                                         <Image
-                                            /* src={dataMe?.avatarUrl ?? tmpProfilePicture}  */
+                                            onClick={handleImageClick}
                                             id="imagetoedit"
                                             src={previewUrl || dataMe?.avatarUrl || tmpProfilePicture}
                                             alt="profile"
+                                            priority
                                             width={80}
                                             height={80}
-                                            className="w-20 h-20" />
+                                            className="w-20 h-20 cursor-pointer" />
                                     </div>
                                     <input
                                         type="file"
