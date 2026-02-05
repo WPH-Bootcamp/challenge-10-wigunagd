@@ -40,3 +40,8 @@ export const doUpdateProfile = async (formdata: FormData) => {
     const response = await apiAxios.patch(`/users/profile`, formdata);
     return response.data;
 }
+
+export const doDeleteComment = async (commentId: number) => {
+    const response = await apiAxios.delete(`/comments/${commentId}`);
+    return response.data;
+}

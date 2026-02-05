@@ -11,7 +11,7 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useDoDelete, useDoUpdatePassword, useDoUpdateProfile, useGetComments, useGetLikes, useGetMyPosts } from "./hooksMyProfile";
+import { useDoDelete, useDoDeleteComment, useDoUpdatePassword, useDoUpdateProfile, useGetComments, useGetLikes, useGetMyPosts } from "./hooksMyProfile";
 import { BlogCardSkeleton } from "@/components/BlogCardSkeleton";
 import BlogCard from "@/components/BlogCard";
 import {
@@ -33,8 +33,8 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import Link from "next/link";
 import ButtonWriteNewPost from "./CommonComponentMyProfile";
 import ProfileSkeleton from "@/components/ProfileSkeleton";
-
-
+import { MdDelete } from "react-icons/md";
+import CommentCard from "@/components/CommentCard";
 
 
 const MyProfile = () => {
@@ -54,6 +54,8 @@ const MyProfile = () => {
     const [idStatistic, setIdStatistic] = useState(0);
     const [isDialogDeleteOpen, setIsDialogDeleteOpen] = useState(false);
     const [idDelete, setIdDelete] = useState(0);
+    const [isDialogDeleteCommentOpen, setIsDialogDeleteCommentOpen] = useState(false);
+    const [idDeleteComment, setIdDeleteComment] = useState(0);
     const [pageQuery, setPageQuery] = useState(1);
     const {
         data: dataPosts,
@@ -78,6 +80,7 @@ const MyProfile = () => {
     const { data: dataComments } = useGetComments(idStatistic);
 
     const { mutate: mutateHapus, isPending: ispendingHapus } = useDoDelete();
+    const { mutate: mutateHapusComment, isPending: ispendingHapusComment } = useDoDeleteComment();
 
     const handlePageNextPrev = (i: number) => {
         let valPageQuery = pageQuery + i;
@@ -115,6 +118,27 @@ const MyProfile = () => {
                 onSuccess: () => {
                     toast.success('Berhasil menghapus', { position: "bottom-center" });
                     setIsDialogDeleteOpen(false);
+                },
+                onError: (e) => {
+                    const error = e as AxiosError<ApiErrorResponse>;
+                    const serverMessage = error.response?.data?.message || error.message;
+                    toast.error(`Gagal menghapus. Status: ${serverMessage}`, { position: "bottom-center" })
+                }
+            });
+        }
+    }
+
+    const handleDeleteComment = (idComment: number) => {
+        setIdDeleteComment(idComment);
+        setIsDialogDeleteCommentOpen(true);
+    };
+
+    const handleDoDeleteComment = () => {
+        if (idDeleteComment && idDeleteComment > 0) {
+            mutateHapusComment(idDeleteComment, {
+                onSuccess: () => {
+                    toast.success('Berhasil menghapus komentar', { position: "bottom-center" });
+                    setIsDialogDeleteCommentOpen(false);
                 },
                 onError: (e) => {
                     const error = e as AxiosError<ApiErrorResponse>;
@@ -633,24 +657,28 @@ const MyProfile = () => {
                                                     <span className="text-sm font-semibold">{likes.name}</span>
                                                     <span className="text-sm">{likes.headline}</span>
                                                 </div>
+
                                             </div>
                                         ))
                                     }
                                 </div>
                             </TabsContent>
 
-                            <TabsContent value="commenttab" className="mt-6 flex flex-col gap-2">
+                            <TabsContent value="commenttab" className="mt-6 flex flex-col gap-3">
                                 <span className="text-lg font-bold">Comment ({dataComments?.length ?? 0})</span>
-                                <div className="flex flex-col gap-2">
+                                <div className="flex flex-col gap-2 border-b">
                                     {
                                         dataComments?.map((comment, i) => (
-                                            <Link href={`/profile/${comment.author.id}`} key={i} target="_blank" className={`flex flex-row py-3 gap-3 ${i < (dataComments.length - 1) ? 'border-b' : ''}`}>
-                                                <Image src={comment.author.avatarUrl ?? tmpProfilePicture} alt={comment.author.name} width={48} height={48} className="w-12 h-12 rounded-full" />
-                                                <div className="flex flex-col gap-1">
-                                                    <span className="text-sm font-semibold">{comment.author.name}</span>
-                                                    <span className="text-sm">{comment.author.headline}</span>
-                                                </div>
-                                            </Link>
+                                            <div key={i} className="flex flex-col ">
+                                                <CommentCard
+                                                    action={(idDeleteComment: number) => handleDeleteComment(idDeleteComment)}
+                                                    id={comment.id}
+                                                    author={comment.author}
+                                                    createdAt={comment.createdAt}
+                                                    content={comment.content}
+                                                />
+
+                                            </div>
                                         ))
                                     }
                                 </div>
@@ -668,12 +696,36 @@ const MyProfile = () => {
                         </DialogHeader>
                         <p className="mx-6">Are you sure to delete?</p>
                         <DialogFooter className="flex flex-row justify-end px-6">
-                            <Button variant={'ghost'} className="rounded-full text-sm w-full md:max-w-30 max-w-[156.5px] h-12">Cancel</Button>
+                            <Button 
+                            onClick={() => setIsDialogDeleteOpen(false)}
+                            variant={'ghost'} className="rounded-full text-sm w-full md:max-w-30 max-w-[156.5px] h-12">Cancel</Button>
                             <Button
                                 disabled={ispendingHapus}
                                 onClick={handleDoDelete}
                                 className="rounded-full text-sm font-semibold bg-danger w-full md:max-w-42.75 max-w-[156.5px] h-12">
                                 {ispendingHapus && (<Spinner />)}
+                                Delete</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
+                <Dialog open={isDialogDeleteCommentOpen} onOpenChange={() => setIsDialogDeleteCommentOpen(!isDialogDeleteCommentOpen)}>
+                    <DialogContent className="md:max-w-134.25 flex flex-col gap-4 overflow-hidden rounded-3xl p-3">
+                        <DialogHeader className="px-6 h-16 flex flex-row items-center justify-between flex-none ">
+                            <DialogTitle className="text-xl font-bold">
+                                Delete Comment
+                            </DialogTitle>
+                        </DialogHeader>
+                        <p className="mx-6">Are you sure to delete comment?</p>
+                        <DialogFooter className="flex flex-row justify-end px-6">
+                            <Button 
+                            onClick={() => setIsDialogDeleteCommentOpen(false)}
+                            variant={'ghost'} className="rounded-full text-sm w-full md:max-w-30 max-w-[156.5px] h-12">Cancel</Button>
+                            <Button
+                                disabled={ispendingHapusComment}
+                                onClick={handleDoDeleteComment}
+                                className="rounded-full text-sm font-semibold bg-danger w-full md:max-w-42.75 max-w-[156.5px] h-12">
+                                {ispendingHapusComment && (<Spinner />)}
                                 Delete</Button>
                         </DialogFooter>
                     </DialogContent>

@@ -15,7 +15,7 @@ export interface CommentAuthor extends UserBase {
 export interface PostComment {
   id: number;
   content: string;
-  createdAt: string; 
+  createdAt: Date; 
   author: CommentAuthor;
 }
 

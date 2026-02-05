@@ -1,7 +1,7 @@
 import { BlogResponse } from "@/types/blog"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { AxiosError } from "axios"
-import { doDelete, doUpdatePassword, doUpdateProfile, getComments, getLikes, getMyPosts } from "./apiMyProfile"
+import { doDelete, doDeleteComment, doUpdatePassword, doUpdateProfile, getComments, getLikes, getMyPosts } from "./apiMyProfile"
 import { PostCommentList, PostLikeList } from "@/types/commentlike"
 import { GenericResponse } from "@/types/apiresponse"
 import { ChangePasswordRequestBody } from "@/types/profile"
@@ -23,7 +23,7 @@ export const useGetLikes = (id: number) => {
 
 export const useGetComments = (id: number) => {
     return useQuery<PostCommentList, AxiosError>({
-        queryKey: ['commentList', id],
+        queryKey: ['commentList'],
         queryFn: () => getComments(id),
         enabled: !!id && id > 0
     })
@@ -51,6 +51,16 @@ export const useDoUpdateProfile = () => {
         mutationFn: (body) => doUpdateProfile(body),
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['me']});
+        }
+    })
+}
+
+export const useDoDeleteComment = () => {
+    const queryClient = useQueryClient();
+    return useMutation<GenericResponse, AxiosError, number>({
+        mutationFn: (id: number) => doDeleteComment(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['commentList']});
         }
     })
 }

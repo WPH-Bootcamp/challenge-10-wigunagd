@@ -9,12 +9,13 @@ type CommentCardProps = {
     author: CommentAuthor;
     createdAt: Date;
     content: string;
+    action?: (idDeleteComment: number) => void;
 }
 
-const CommentCard = ({ id, author, createdAt, content }: CommentCardProps) => {
+const CommentCard = ({ id, author, createdAt, content, action }: CommentCardProps) => {
     return (
         <div key={id}
-            className="grid border-t py-3 text-sm gap-3">
+            className={`grid w-full py-3 text-sm gap-3 relative ${action ? 'border-b' : 'border-t'}`}>
             <div className="flex gap-2 items-center">
                 <Image
                     src={author.avatarUrl
@@ -32,6 +33,7 @@ const CommentCard = ({ id, author, createdAt, content }: CommentCardProps) => {
                 </Link>
             </div>
             <p>{content}</p>
+            {action && (<a href="#" onClick={() => action(id)} className="absolute font-semibold colorerrormsg text-xs right-0">Delete</a>)}
         </div>
     )
 }
