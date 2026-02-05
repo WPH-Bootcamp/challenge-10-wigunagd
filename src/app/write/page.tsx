@@ -12,10 +12,13 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import Link from "next/link";
-import { Textarea } from "@/components/ui/textarea";
 import { iconArrowExport, iconSelectUpload, iconTrash } from "../../../public/asset/asset";
 import { Badge } from "@/components/ui/badge";
 import RichTextEditor from "@/components/RichTextEditor";
+import { useDoSendPost } from "./hooksWrite";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+import { ApiErrorResponse } from "@/types/apiresponse";
 
 const Write = () => {
     const authState = useAppSelector((state) => state.auth);
@@ -35,10 +38,11 @@ const Write = () => {
     const [postTags, setPostTags] = useState<string[]>([]);
     const [postTagsValid, setPostTagsValid] = useState(true);
     const [tagInputValue, setTagInputValue] = useState("");
-    const [updateProfileErrMsg, setUpdateProfileErrMsg] = useState("");
+    const [sendPostErrMsg, setSendPostErrMsg] = useState("");
 
     const profileImageMaxSize = 5 * 1024 * 1024;
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [postImage, setPostImage] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     const handleImageClick = () => {
@@ -55,11 +59,12 @@ const Write = () => {
         if (file) {
 
             if (file.size > profileImageMaxSize) {
-                setUpdateProfileErrMsg("Gambar maximum 5MB");
+                setSendPostErrMsg("Gambar maximum 5MB");
             } else {
-                setUpdateProfileErrMsg("");
+                setSendPostErrMsg("");
             }
 
+            setPostImage(file);
             const url = URL.createObjectURL(file);
             setPreviewUrl(url);
         }
@@ -87,12 +92,65 @@ const Write = () => {
         setPostTags(postTags.filter((tag) => tag !== tagToRemove));
     };
 
+    const { mutate: mutateSendPost, isPending: isPendingSendPost } = useDoSendPost();
+
+    const onSubmitPost = (e: React.FormEvent) => {
+        e.preventDefault();
+        setSendPostErrMsg("");
+
+        const isPostTitleValid = postTitle.trim().length > 0;
+        const isPostContentValid = postContent.trim().length > 0;
+        const isPostTagsValid = postTags.length > 0;
+        setPostTitleValid(isPostTitleValid);
+        setPostContentValid(isPostContentValid);
+        setPostTagsValid(isPostTagsValid);
+
+        if (!isPostTitleValid || !isPostContentValid || !isPostTagsValid) {
+            setSendPostErrMsg("Lengkapi data Title, Content dan Tags.");
+            return;
+        }
+
+        if (postImage) {
+            if (postImage.size > profileImageMaxSize) {
+                setSendPostErrMsg("Gambar maximum 5MB.");
+                return;
+            }
+        }
+
+        console.log(postTitle, 'postTitle');
+        console.log(postContent, 'postContent');
+        console.log(postTags, 'postTags');
+
+
+        const formData = new FormData();
+        formData.append("title", postTitle);
+        formData.append("content", postContent);
+        postTags.forEach((tag) => {
+            formData.append("tags", tag);
+        });
+        if (postImage) {
+            formData.append("image", postImage);
+        }
+
+        mutateSendPost(formData, {
+            onSuccess(response) {
+                toast.success('Post berhasil disimpan.', { position: "bottom-center" });
+                router.push(`/detail/${response.id}`);
+            },
+            onError(e) {
+                const error = e as AxiosError<ApiErrorResponse>;
+                const serverMessage = error.response?.data?.message || error.message;
+                setSendPostErrMsg(serverMessage);
+            }
+        });
+    };
+
     return (
         <div className="min-h-screen flex flex-col">
             <NavigationWriteEdit title="Write Post" />
             <main className="container mt-20 mx-auto w-full max-w-360 py-2 grow">
                 <div className="flex flex-col w-full max-w-200 mx-auto my-5 px-5 md:px-0 gap-5">
-                    <form method="POST" className="grid gap-5">
+                    <form method="POST" onSubmit={onSubmitPost} className="grid gap-5">
 
                         <div className="grid gap-4">
                             <Label htmlFor="postTitle" className="text-sm">Title</Label>
@@ -102,7 +160,8 @@ const Write = () => {
                                     type="text"
                                     placeholder="Enter your title"
                                     className="pr-10 h-12 rounded-xl text-sm"
-                                    required
+                                    value={postTitle}
+                                    onChange={(e) => setPostTitle(e.target.value)}
                                     aria-invalid={!postTitleValid}
                                 />
                                 {!postTitleValid && (<FieldLabel className="text-xs colorerrormsg" >Title required</FieldLabel>)}
@@ -113,10 +172,11 @@ const Write = () => {
                             <Label htmlFor="postContent" className="text-sm">Content</Label>
                             <div>
                                 <RichTextEditor
+                                    id="richtexteditor"
                                     content={postContent}
                                     onChange={(html) => {
                                         setPostContent(html);
-                                        setPostContentValid(html.length > 7); 
+                                        setPostContentValid(html.length > 7);
                                     }}
                                 />
                                 {!postContentValid && (<FieldLabel className="text-xs colorerrormsg" >Content required</FieldLabel>)}
@@ -190,7 +250,7 @@ const Write = () => {
                                     </div>
                                 </div>
 
-                                {!postTagsValid && (<FieldLabel className="text-xs colorerrormsg" >Tags required</FieldLabel>)}
+                                {!postTagsValid && (<FieldLabel className="text-xs colorerrormsg" >Image required</FieldLabel>)}
                             </Field>
                         </div>
 
@@ -224,10 +284,18 @@ const Write = () => {
                             </Field>
                         </div>
 
-                        <div className="flex justify-end">
-                            <Button className="w-full md:max-w-66.25 rounded-full h-12 text-sm">Finish</Button>
+                        <div className="flex flex-col items-end">
+                            {sendPostErrMsg.length >= 0 && (<FieldLabel className="text-xs colorerrormsg w-full" >aaaa{sendPostErrMsg}</FieldLabel>)}
+                            <Button
+                                disabled={isPendingSendPost}
+                                type="submit"
+                                className="w-full md:max-w-66.25 rounded-full h-12 text-sm">
+                                {isPendingSendPost && (<Spinner />)}
+                                Finish
+                            </Button>
                         </div>
                     </form>
+
                 </div>
             </main>
             <Footer />

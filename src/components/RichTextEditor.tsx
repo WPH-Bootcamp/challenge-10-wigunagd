@@ -11,13 +11,15 @@ import {
 } from 'lucide-react'
 import { Toggle } from "@/components/ui/toggle"
 import { Separator } from "@/components/ui/separator"
+import { useEffect } from 'react'
 
 interface RichTextEditorProps {
+    id: string;
     content: string;
     onChange: (content: string) => void;
 }
 
-const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
+const RichTextEditor = ({ id, content, onChange }: RichTextEditorProps) => {
     const editor = useEditor({
         extensions: [
             StarterKit,
@@ -36,10 +38,16 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
         },
     });
 
+    useEffect(() => {
+        if (editor && content !== editor.getHTML()) {
+            editor.commands.setContent(content);
+        }
+    }, [content, editor]);
+
     if (!editor) return null;
 
     return (
-        <div className="border rounded-xl overflow-hidden focus-within:ring-1 focus-within:ring-neutral-400 transition-all bg-white">
+        <div id={id} className="border rounded-xl overflow-hidden focus-within:ring-1 focus-within:ring-neutral-400 transition-all bg-white">
             {/* Toolbar Area */}
             <div className="flex flex-wrap items-center gap-1 p-1 border-b bg-white">
 
