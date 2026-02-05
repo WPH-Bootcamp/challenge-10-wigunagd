@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { useDoComment, useDoLike, useGetPostAuthorDetail, useGetPostDetail, useGetPostDetailComment } from "./hooksDetail";
 import { useParams, usePathname } from "next/navigation";
 import Image from "next/image";
-import { iconComment, iconLike, iconLiked, tmpBlogimg, tmpProfilePicture } from "../../../../public/asset/asset";
+import { iconComment, iconLike, iconLiked, tmpProfilePicture } from "../../../../public/asset/asset";
 import { formattedDate } from "@/lib/formatDate";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import { Button } from "@/components/ui/button";

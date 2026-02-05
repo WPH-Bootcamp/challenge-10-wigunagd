@@ -20,7 +20,6 @@ import { AxiosError } from "axios";
 import { ApiErrorResponse } from "@/types/apiresponse";
 import { useGetPostDetail } from "@/app/detail/[id]/hooksDetail";
 import { WritePostSkeleton } from "@/components/WritePostSkeleton";
-import { Textarea } from "@/components/ui/textarea";
 import { useDoEditPost } from "./hooksEditPost";
 
 const EditPost = () => {
