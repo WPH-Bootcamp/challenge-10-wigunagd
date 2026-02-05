@@ -62,6 +62,7 @@ const EditPost = () => {
     const [postTitleValid, setPostTitleValid] = useState(true);
     const [postContentValid, setPostContentValid] = useState(true);
     const [postTagsValid, setPostTagsValid] = useState(true);
+    const [removeImage, setRemoveImage] = useState(false);
     const [sendPostErrMsg, setSendPostErrMsg] = useState("");
 
 
@@ -86,6 +87,7 @@ const EditPost = () => {
 
     const handleClearImageClick = () => {
         setPreviewUrl(null);
+        setRemoveImage(true);
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,13 +164,15 @@ const EditPost = () => {
         });
         if (postImage) {
             formData.append("image", postImage);
-        }else{
-            formData.append("removeImage", "1");
+        } else {
+            if (removeImage) {
+                formData.append("removeImage", "1");
+            }
         }
 
         const postId = Number(id);
 
-        mutateEditPost({ id: postId, formdata : formData }, {
+        mutateEditPost({ id: postId, formdata: formData }, {
             onSuccess(response) {
                 toast.success('Post berhasil disimpan.', { position: "bottom-center" });
                 router.push(`/detail/${response.id}`);

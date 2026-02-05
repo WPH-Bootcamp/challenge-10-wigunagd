@@ -284,8 +284,8 @@ const Write = () => {
                             </Field>
                         </div>
 
+                            {sendPostErrMsg.length >= 0 && (<FieldLabel className="flex flex-col text-xs colorerrormsg w-full" >{sendPostErrMsg}</FieldLabel>)}
                         <div className="flex flex-col items-end">
-                            {sendPostErrMsg.length >= 0 && (<FieldLabel className="text-xs colorerrormsg w-full" >aaaa{sendPostErrMsg}</FieldLabel>)}
                             <Button
                                 disabled={isPendingSendPost}
                                 type="submit"
