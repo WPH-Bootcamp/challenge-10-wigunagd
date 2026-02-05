@@ -8,7 +8,7 @@ import { ChangePasswordRequestBody } from "@/types/profile"
 
 export const useGetMyPosts = (params: BlogResponse) => {
     return useQuery<BlogResponse, AxiosError>({
-        queryKey: ['MyPosts'],
+        queryKey: ['MyPosts', params],
         queryFn: () => getMyPosts(params)
     })
 }

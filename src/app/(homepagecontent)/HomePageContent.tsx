@@ -3,7 +3,7 @@
 import BlogCard from "@/components/BlogCard";
 import BlogCardNoPic from "@/components/BlogCardNoPic";
 import { useGetRecommendations, useGetMostLiked } from "./hooksHomepageContents";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { iconPagePrevious, iconPageNext } from "../../../public/asset/asset";
@@ -46,10 +46,23 @@ const HomePageContent = () => {
         }
     }
 
+    const scrolltToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
+
+    useEffect(() => {
+        if (!isFetchingRecommendation && !isLoadingRecommendation && dataRecommendation) {
+            scrolltToTop();
+        }
+    }, [isFetchingRecommendation, isLoadingRecommendation, dataRecommendation]);
+
     return (
         <div className="md:flex grid w-full max-w-[1440px] md:mx-0 md:mb-15 md:px-0 px-4 gap-5">
             <aside className="md:w-3/4 md:border-r-2 md:pr-10 relative">
-                <h1 className="text-3xl font-bold mt-7">Recommend For You </h1>
+                <h1 id="recomendation" className="text-3xl font-bold mt-7">Recommend For You </h1>
 
                 <div className="w-full flex flex-col relative">
 
@@ -76,8 +89,8 @@ const HomePageContent = () => {
                 </div>
 
                 {(!isLoadingRecommendation && maxPageRecommendation > 1) && (
-                    <div id="pagination" 
-                    className={`flex flex-row w-full justify-center items-center my-2 gap-2 
+                    <div id="pagination"
+                        className={`flex flex-row w-full justify-center items-center my-2 gap-2 
                     ${isFetchingRecommendation ? 'opacity-50 pointer-events-none' : ''}`}>
 
                         <Button

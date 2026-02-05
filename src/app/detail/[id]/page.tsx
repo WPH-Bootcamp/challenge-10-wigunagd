@@ -160,7 +160,7 @@ const Detail = () => {
                     src={dataPostDetail?.imageUrl}
                     alt="Post Image"
                     fill
-                    className="object-cover rounded-lg"
+                    className="object-contain rounded-lg"
                     priority
                   />
                 </AspectRatio>

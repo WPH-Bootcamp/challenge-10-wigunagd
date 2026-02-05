@@ -112,6 +112,19 @@ const MyProfile = () => {
             });
         }
     }
+
+     const scrolltToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
+
+    useEffect(() => {
+        if (!isFetchingPosts && !isLoadingPosts && dataPosts) {
+            scrolltToTop();
+        }
+    }, [dataPosts, isFetchingPosts, isLoadingPosts]);
     // posts
 
     // change password
