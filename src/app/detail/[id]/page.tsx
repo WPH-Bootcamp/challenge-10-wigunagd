@@ -154,15 +154,17 @@ const Detail = () => {
                 </Link>
               </div>
 
-              <AspectRatio ratio={16 / 9}>
-                <Image
-                  src={dataPostDetail?.imageUrl ?? tmpBlogimg}
-                  alt="Post Image"
-                  fill
-                  className="object-cover rounded-lg"
-                  priority
-                />
-              </AspectRatio>
+              {dataPostDetail?.imageUrl && (
+                <AspectRatio ratio={16 / 9}>
+                  <Image
+                    src={dataPostDetail?.imageUrl}
+                    alt="Post Image"
+                    fill
+                    className="object-cover rounded-lg"
+                    priority
+                  />
+                </AspectRatio>
+              )}
 
               <div className="flex w-full">
                 <div dangerouslySetInnerHTML={{ __html: dataPostDetail?.content || "" }} />

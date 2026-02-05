@@ -21,6 +21,7 @@ import { ApiErrorResponse } from "@/types/apiresponse";
 import { useGetPostDetail } from "@/app/detail/[id]/hooksDetail";
 import { WritePostSkeleton } from "@/components/WritePostSkeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { useDoEditPost } from "./hooksEditPost";
 
 const EditPost = () => {
     const authState = useAppSelector((state) => state.auth);
@@ -126,7 +127,7 @@ const EditPost = () => {
         setPostTags(postTags.filter((tag) => tag !== tagToRemove));
     };
 
-    // const { mutate: mutateSendPost, isPending: isPendingSendPost } = useDoSendPost();
+    const { mutate: mutateEditPost, isPending: isPendingEditPost } = useDoEditPost();
 
     const onSubmitPost = (e: React.FormEvent) => {
         e.preventDefault();
@@ -139,9 +140,7 @@ const EditPost = () => {
         setPostContentValid(isPostContentValid);
         setPostTagsValid(isPostTagsValid);
 
-        const isImageValid = !!previewUrl || !!postImage;
-
-        if (!isPostTitleValid || !isPostContentValid || !isPostTagsValid || !isImageValid) {
+        if (!isPostTitleValid || !isPostContentValid || !isPostTagsValid) {
             setSendPostErrMsg("Lengkapi data Title, Content dan Tags.");
             return;
         }
@@ -163,9 +162,13 @@ const EditPost = () => {
         });
         if (postImage) {
             formData.append("image", postImage);
+        }else{
+            formData.append("removeImage", "1");
         }
 
-        /* mutateSendPost(formData, {
+        const postId = Number(id);
+
+        mutateEditPost({ id: postId, formdata : formData }, {
             onSuccess(response) {
                 toast.success('Post berhasil disimpan.', { position: "bottom-center" });
                 router.push(`/detail/${response.id}`);
@@ -175,7 +178,7 @@ const EditPost = () => {
                 const serverMessage = error.response?.data?.message || error.message;
                 setSendPostErrMsg(serverMessage);
             }
-        }); */
+        });
     };
 
     return (
@@ -329,12 +332,12 @@ const EditPost = () => {
                             </div>
 
                             <div className="flex flex-col items-end">
-                                {sendPostErrMsg.length > 0 && (<FieldLabel className="text-xs colorerrormsg w-full" >aaaa{sendPostErrMsg}</FieldLabel>)}
+                                {sendPostErrMsg.length > 0 && (<FieldLabel className="text-xs colorerrormsg w-full" >{sendPostErrMsg}</FieldLabel>)}
                                 <Button
-                                    /* disabled={isPendingSendPost} */
+                                    disabled={isPendingEditPost}
                                     type="submit"
                                     className="w-full md:max-w-66.25 rounded-full h-12 text-sm">
-                                    {/* {isPendingSendPost && (<Spinner />)} */}
+                                    {isPendingEditPost && (<Spinner />)}
                                     Finish
                                 </Button>
                             </div>
