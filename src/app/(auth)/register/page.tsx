@@ -94,9 +94,11 @@ const Register = () => {
         }
 
         if (isNameValid && isEmailValid && isPasswdValid && passwordsMatch) {
+            const username = name.replace(/[^a-zA-Z0-9]/g, '');
+
             mutate({
                 name: name,
-                username: name,
+                username: username,
                 email: email,
                 password: passwd
             }, {
@@ -139,6 +141,7 @@ const Register = () => {
                             <Label htmlFor="name" className="text-sm">Name</Label>
                             <Field data-invalid={!nameValid}>
                                 <Input
+                                    disabled={isPending}
                                     id="name"
                                     type="text"
                                     placeholder="Enter your name"
@@ -157,6 +160,7 @@ const Register = () => {
                             <Label htmlFor="email" className="text-sm">Email</Label>
                             <Field data-invalid={!emailValid}>
                                 <Input
+                                    disabled={isPending}
                                     id="email"
                                     type="email"
                                     placeholder="Enter your email"
@@ -178,6 +182,7 @@ const Register = () => {
                             <Field data-invalid={!passwdValid}>
                                 <div className="relative">
                                     <Input
+                                        disabled={isPending}
                                         id="password"
                                         type={showPassword ? "text" : "password"}
                                         placeholder="Enter your password"
@@ -214,6 +219,7 @@ const Register = () => {
                             <Field data-invalid={!confirmpasswdValid}>
                                 <div className="relative">
                                     <Input
+                                        disabled={isPending}
                                         id="passwordconfirm"
                                         type={showPasswordConfirm ? "text" : "password"}
                                         placeholder="Enter your confirm password"

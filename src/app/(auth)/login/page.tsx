@@ -98,6 +98,7 @@ const Login = () => {
                             <Label htmlFor="email" className="text-sm">Email</Label>
                             <Field data-invalid={!emailValid}>
                                 <Input
+                                    disabled={isPending}
                                     id="email"
                                     type="email"
                                     placeholder="Enter your email"
@@ -118,6 +119,7 @@ const Login = () => {
                             <Field data-invalid={!passwdValid}>
                                 <div className="relative">
                                     <Input
+                                        disabled={isPending}
                                         id="password"
                                         type={showPassword ? "text" : "password"}
                                         placeholder="Enter your password"

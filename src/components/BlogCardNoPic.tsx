@@ -10,7 +10,7 @@ const BlogCardNoPic = ({ id, title, content, likes, comments }: BlogPost) => {
             <div className="w-full flex flex-col gap-3">
                 <Link href={`/detail/${id}`} className="text-xl font-bold">{title}</Link>
                 <div className="text-ellipsis text-sm line-clamp-2">
-                    {stripHtml(content ?? "")}
+                    {stripHtml(content ?? "").slice(0, 230)}
                 </div>
                 <div className="flex flex-row gap-5 items-center">
                     <span className="flex items-center gap-2 text-sm">

@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/3_redux";
 
 import { logout } from "@/redux/1_authSlice";
 import { useGetMe } from "@/app/(getme)/hooksGetMe";
-import { setMeData } from "@/redux/1_meSlice";
+import { clearMeData, setMeData } from "@/redux/1_meSlice";
 import NavigationProfilePart from "./NavigationProfilePart";
 
 const MotionButton = motion.create(Button);
@@ -87,6 +87,8 @@ const Navigation = () => {
 
     const handleLogout = () => {
         dispatch(logout());
+        dispatch(clearMeData());
+        window.location.reload();
     }
 
     return (
@@ -178,7 +180,7 @@ const Navigation = () => {
 
                     {/* saat sudah login */}
                     {isuser && (
-                        <div className="flex items-center h-full gap-2 pl-2 order-2">
+                        <div className="flex items-center h-full gap-2 pl-2 order-2 md:mr-6">
 
                             <Button variant='link' asChild className="font-semibold underline h-auto py-0 md:flex hidden">
                                 <Link href="/write" className="flex items-center gap-2">

@@ -8,7 +8,7 @@ const NavigationProfilePart = ({avatarUrl, name, handleLogout} : {avatarUrl: str
     return (
         <DropdownMenu modal={false} key={`dropdownMenuProfile`}>
             <DropdownMenuTrigger asChild>
-                <Button variant={'ghost'} className="h-auto py-1 flex items-center gap-3">
+                <Button variant={'ghost'} className="h-auto py-2 px-2 flex items-center gap-3">
                     <div className="flex items-center justify-center w-10 h-10 border rounded-full overflow-hidden">
                         <Image src={avatarUrl ?? tmpProfilePicture} alt="profile" width={40} height={40} className="w-10 h-10" />
                     </div>

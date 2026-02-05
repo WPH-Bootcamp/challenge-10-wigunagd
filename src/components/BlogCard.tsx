@@ -41,7 +41,7 @@ const BlogCard = ({ id, title, content, tags, imageUrl, author, createdAt, likes
                     }
                 </div>
                 <div className="text-ellipsis text-sm line-clamp-2">
-                    {stripHtml(content ?? '')}
+                    {stripHtml(content ?? '').slice(0, 230)}
                 </div>
 
                 {!action && (

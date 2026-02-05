@@ -174,6 +174,10 @@ const MyProfile = () => {
                     setCurrentPassword('');
                     setNewPassword('');
                     setConfirmNewPassword('');
+
+                    setShowCurrentPassword(false);
+                    setShowNewPassword(false);
+                    setShowConfirmPassword(false);
                 },
                 onError(e) {
                     const error = e as AxiosError<ApiErrorResponse>;

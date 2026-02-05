@@ -22,7 +22,7 @@ const HomePageContent = () => {
         data: dataMostLiked,
         isLoading: isLoadingMostLiked,
         isFetching: isFetchingMostLiked
-    } = useGetMostLiked({ page: pageQuery, limit: 3 });
+    } = useGetMostLiked({ page: pageQuery, limit: 10 });
 
     const maxPageRecommendation = dataRecommendation?.lastPage ?? 1;
 

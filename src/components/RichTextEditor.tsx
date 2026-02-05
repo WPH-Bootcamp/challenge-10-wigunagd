@@ -48,12 +48,10 @@ const RichTextEditor = ({ id, content, onChange }: RichTextEditorProps) => {
 
     return (
         <div id={id} className="border rounded-xl overflow-hidden focus-within:ring-1 focus-within:ring-neutral-400 transition-all bg-white">
-            {/* Toolbar Area */}
             <div className="flex flex-wrap items-center gap-1 p-1 border-b bg-white">
 
                 <Separator orientation="vertical" className="h-6 mx-1" />
 
-                {/* Text Formatting */}
                 <Toggle size="sm" pressed={editor.isActive('bold')} onPressedChange={() => editor.chain().focus().toggleBold().run()}>
                     <Bold className="h-4 w-4" />
                 </Toggle>
@@ -66,7 +64,6 @@ const RichTextEditor = ({ id, content, onChange }: RichTextEditorProps) => {
 
                 <Separator orientation="vertical" className="h-6 mx-1" />
 
-                {/* Lists */}
                 <Toggle size="sm" pressed={editor.isActive('bulletList')} onPressedChange={() => editor.chain().focus().toggleBulletList().run()}>
                     <List className="h-4 w-4" />
                 </Toggle>
@@ -76,7 +73,6 @@ const RichTextEditor = ({ id, content, onChange }: RichTextEditorProps) => {
 
                 <Separator orientation="vertical" className="h-6 mx-1" />
 
-                {/* Alignment */}
                 <Toggle size="sm" pressed={editor.isActive({ textAlign: 'left' })} onPressedChange={() => editor.chain().focus().setTextAlign('left').run()}>
                     <AlignLeft className="h-4 w-4" />
                 </Toggle>
@@ -90,7 +86,7 @@ const RichTextEditor = ({ id, content, onChange }: RichTextEditorProps) => {
                     <AlignJustify className="h-4 w-4" />
                 </Toggle>
 
-                {/* History & Utils */}
+
                 <button onClick={() => editor.chain().focus().undo().run()} className="p-2 hover:bg-neutral-100 rounded-md">
                     <Undo className="h-4 w-4" />
                 </button>
